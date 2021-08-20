@@ -25,12 +25,11 @@
    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
    crossorigin=""></script>
 <script type="text/javascript">
-<% cached 'Locations', $Locations.Count %>
+
    var locations = [
    <% loop $Locations %>["<b>$Name.XML</b><br />$Address.XML<br /><br /><% loop $Times %>$Day.Nice: $StartTime.Nice - $EndTime.Nice<br /><% end_loop %>", $Lat, $Lng, $ID]<% if not $Last %>,<% end_if %>
    <% end_loop %>
    ];
-<% end_cached %>
 
 var mymap = L.map('mapid').setView([-41.00, 174.00], 6);
 L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
