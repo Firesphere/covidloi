@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2b47f6cdea473f20d9ccd61737479cfa",
+    "content-hash": "65e15a04d3103c3806df488c7affd40c",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -3964,6 +3964,59 @@
                 "source": "https://github.com/Spomky-Labs/otphp/tree/v9.0"
             },
             "time": "2019-03-18T10:08:51+00:00"
+        },
+        {
+            "name": "steadlane/silverstripe-cloudflare",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/steadlane/silverstripe-cloudflare.git",
+                "reference": "bd29396cda9078e4d008e7643a37ae6df0ffbc86"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/steadlane/silverstripe-cloudflare/zipball/bd29396cda9078e4d008e7643a37ae6df0ffbc86",
+                "reference": "bd29396cda9078e4d008e7643a37ae6df0ffbc86",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": "^5.6 || ^7",
+                "psr/cache": "*",
+                "silverstripe/cms": "^4",
+                "silverstripe/framework": "^4",
+                "silverstripe/vendor-plugin": "^1"
+            },
+            "type": "silverstripe-vendormodule",
+            "extra": {
+                "installer-name": "silverstripe-cloudflare",
+                "expose": [
+                    "css",
+                    "assets"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD (3-Clause)"
+            ],
+            "authors": [
+                {
+                    "name": "Reece Alexander",
+                    "email": "support@steadlane.com.au"
+                },
+                {
+                    "name": "Andrew Pike",
+                    "email": "support@steadlane.com.au"
+                }
+            ],
+            "description": "This module aims to relieve the stress of using Cloudflare caching with any SilverStripe project. Adds extension hooks that clears Cloudflare's cache for a specific page when that page is published or unpublished.",
+            "keywords": [
+                "cache",
+                "cloudflare",
+                "silverstripe"
+            ],
+            "time": "2019-09-03T06:05:04+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",

@@ -18,6 +18,8 @@ use SilverStripe\ORM\FieldType\DBDatetime;
  * @property string $Lat
  * @property string $Lng
  * @property string $LastUpdated
+ * @property int $CityID
+ * @method City City()
  * @method DataList|LocTime[] Times()
  */
 class Location extends DataObject

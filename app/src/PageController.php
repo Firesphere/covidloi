@@ -37,9 +37,9 @@ class PageController extends ContentController
         {
             parent::init();
 
-            $tmp = Location::get()->exclude([
-                'Address:PartialMatch' => 'Bus'
-            ])
+            $tmp = Location::get()
+                ->exclude(['Lat:GreaterThan' => 0])
+                ->exclude(['Lat' => null])
                 ->column('Name');
             $tmp = array_unique($tmp);
             $this->Locations = Location::get()->filter(['Name' => $tmp]);

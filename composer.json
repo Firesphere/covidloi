@@ -11,7 +11,8 @@
         "paquettg/php-html-parser": "^3",
         "silverstripe/mfa": "^4.3",
         "silverstripe/totp-authenticator": "^4.1",
-        "silverstripe/webauthn-authenticator": "^4.2"
+        "silverstripe/webauthn-authenticator": "^4.2",
+        "steadlane/silverstripe-cloudflare": "^2.0"
     },
     "require-dev": {
         "sminnee/phpunit": "^5.7",
