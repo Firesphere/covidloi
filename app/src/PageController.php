@@ -14,7 +14,7 @@ namespace {
  * @property Page dataRecord
  * @method Page data()
  */
-class PageController extends ContentController
+    class PageController extends ContentController
     {
 
         protected $Locations;
@@ -46,7 +46,7 @@ class PageController extends ContentController
 
         public function rss($request)
         {
-            $data = LocTime::get()->sort('Day DESC, StartTime DESC');
+            $data = $this->getDataItems($request);
             $feed = new RSSFeed(
                 $data,
                 Director::absoluteBaseURL(),
@@ -57,6 +57,36 @@ class PageController extends ContentController
             );
 
             return $feed->outputToBrowser();
+        }
+
+        public function json($request)
+        {
+            $data = $this->getDataItems($request);
+        }
+
+        /**
+         * @param $request
+         * @return \SilverStripe\ORM\DataList
+         */
+        protected function getDataItems($request): \SilverStripe\ORM\DataList
+        {
+            $vars = $request->getVars();
+            $filter = [];
+            $sort = 'Day DESC, StartTime DESC';
+            if (count($vars)) {
+                if (isset($vars['location'])) {
+                    $filter['Location.City.Name'] = ucfirst($request->getVar('location'));
+                }
+                if (isset($vars['date'])) {
+                    $filter['Day'] = date('2021-m-d', strtotime($vars['date']));
+                }
+            }
+
+            $data = LocTime::get()
+                ->filter($filter)
+                ->sort($sort);
+
+            return $data;
         }
     }
 }

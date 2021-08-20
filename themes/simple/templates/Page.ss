@@ -6,10 +6,8 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	$MetaTags(false)
-	<link rel="shortcut icon" href="themes/simple/images/favicon.ico" />
 	<link rel="alternate" type="application/rss+xml"
-  title="RSS Feed for Locations of Interest"
+  title="RSS Feed for Locations of Interest in New Zealand"
   href="/home/rss" />
  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
@@ -19,15 +17,15 @@
   #mapid { position:absolute; top:0; bottom:0; width:100%; }
 </style>
    </head>
-<body class="$ClassName.ShortName">
-		$Layout
+<body>
+<div id="mapid"></div>
  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
    crossorigin=""></script>
 <script type="text/javascript">
 <% cached 'Locations', $Locations.Count %>
    var locations = [
-   <% loop $Locations %>["<b>$Name.XML</b><br />$Address.XML<br /><br /><% loop $Times %>$Day.Nice: $StartTime.Nice - $EndTime.Nice<br /><% end_loop %>", $Lat, $Lng, $ID]<% if not $Last %>,<% end_if %>
+   <% loop $Locations %>["$Description.RAW", $Lat, $Lng, $ID]<% if not $Last %>,<% end_if %>
    <% end_loop %>
    ];
 <% end_cached %>
@@ -37,7 +35,8 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> |' +
      ' contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a> |' +
       ' Locations of Interest: <a href="https://health.govt.nz">Ministry of Health</a> |' +
-       ' <a href="/home/rss">RSS Feed</a>',
+       ' <a href="/home/rss">RSS Feed</a> |' +
+        ' <a href="/help">RSS Help',
     maxZoom: 18,
     id: 'mapbox/streets-v11',
     tileSize: 512,

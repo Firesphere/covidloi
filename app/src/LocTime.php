@@ -36,7 +36,7 @@ class LocTime extends DataObject
         $end = isset($time[1]) ? date('H:i:s', strtotime($time[1])) : null;
         $day = date('Y-m-d', strtotime($data[2]));
 
-        $find = static::get()->filter([
+        $find = LocTime::get()->filter([
             'Day'        => $day,
             'StartTime'  => $start,
             'EndTime'    => $end,
@@ -44,7 +44,7 @@ class LocTime extends DataObject
         ]);
 
         if (!$find->exists()) {
-            static::create([
+            LocTime::create([
                 'Day'        => $day,
                 'StartTime'  => $start,
                 'EndTime'    => $end,

@@ -26,7 +26,6 @@ class City extends DataObject
 
     public static function findOrCreate($city)
     {
-        print_r($city);
         foreach ($city as $value) {
             if ($value['types'][0] == 'administrative_area_level_1') {
                 $city = $value['long_name'];
@@ -36,10 +35,10 @@ class City extends DataObject
         if (is_array($city)) {
             return;
         }
-        $exist = self::get()->filter(['Name' => $city])->first();
+        $exist = City::get()->filter(['Name' => $city])->first();
 
         if (!$exist) {
-            $exist = self::create();
+            $exist = City::create();
             $exist->Name = $city;
             return $exist->write();
         }

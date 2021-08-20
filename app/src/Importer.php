@@ -2,7 +2,6 @@
 
 namespace Firesphere\Mini;
 
-use SilverStripe\Control\Director;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
 
@@ -15,6 +14,7 @@ class Importer extends BuildTask
         if ($truncate) {
             DB::query('TRUNCATE TABLE `Location`');
             DB::query('TRUNCATE TABLE `LocTime`');
+            DB::query('TRUNCATE TABLE `MoHCode`');
             DB::query('TRUNCATE TABLE `City`');
         }
         $content = file_get_contents('https://www.health.govt.nz/our-work/diseases-and-conditions/covid-19-novel-coronavirus/covid-19-health-advice-public/contact-tracing-covid-19/covid-19-contact-tracing-locations-interest');
@@ -32,6 +32,27 @@ class Importer extends BuildTask
             }
             if (count($data)) {
                 Location::findOrCreate($data);
+            }
+        }
+
+        $json = file_get_contents('https://raw.githubusercontent.com/minhealthnz/nz-covid-data/main/locations-of-interest/august-2021/locations-of-interest.geojson');
+
+        $data = json_decode($json, 1);
+        $mohCodes = MoHCode::get()->column('Code');
+        foreach ($data['features'] as $location) {
+            if (!in_array($location['properties']['id'], $mohCodes)) {
+                $map = [
+                    $location['properties']['Event'],
+                    $location['properties']['Location'],
+                    date('Y-m-d', strtotime(str_replace('/', '-', $location['properties']['Start']))),
+                    date('H:i:s', strtotime(str_replace('/', '-', $location['properties']['Start']))) . '-' .
+                    date('H:i:s', strtotime(str_replace('/', '-', $location['properties']['End']))),
+                    $location['properties']['Information'],
+                    date('Y-m-d')
+                ];
+                $mohCodes[] = $location['properties']['id'];
+                MoHCode::create(['Code' => $location['properties']['id']])->write();
+                Location::findOrCreateByLatLng($map);
             }
         }
     }
