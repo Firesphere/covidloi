@@ -12,7 +12,8 @@
         "silverstripe/mfa": "^4.3",
         "silverstripe/totp-authenticator": "^4.1",
         "silverstripe/webauthn-authenticator": "^4.2",
-        "steadlane/silverstripe-cloudflare": "^2.0"
+        "steadlane/silverstripe-cloudflare": "^2.0",
+        "phptek/sentry": "^4.0"
     },
     "require-dev": {
         "sminnee/phpunit": "^5.7",
