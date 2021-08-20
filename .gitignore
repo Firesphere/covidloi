@@ -1,0 +1,11 @@
+/silverstripe-cache/
+/Vagrantfile
+/.env
+/.env.example
+/vendor/
+/_resources/
+/.vagrant
+/.idea
+/.php_cs.cache
+node_modules
+/themes/simple/node_modules
