@@ -16,6 +16,8 @@ namespace {
  */
 class PageController extends ContentController
     {
+
+        protected $Locations;
         /**
          * An array of actions that can be accessed via a request. Each array element should be an action name, and the
          * permissions or conditions required to allow the user to access it.
@@ -37,14 +39,9 @@ class PageController extends ContentController
         {
             parent::init();
 
-            $tmp = Location::get()
+            $this->Locations = Location::get()
                 ->exclude(['Lat:GreaterThan' => 0])
-                ->exclude(['Lat' => null])
-                ->column('Name');
-            $tmp = array_unique($tmp);
-            if (count($tmp)) {
-                $this->Locations = Location::get()->filter(['Name' => $tmp]);
-            }
+                ->exclude(['Lat' => null]);
         }
 
         public function rss($request)
