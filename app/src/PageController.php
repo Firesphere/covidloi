@@ -42,9 +42,9 @@ class PageController extends ContentController
                 ->exclude(['Lat' => null])
                 ->column('Name');
             $tmp = array_unique($tmp);
-            $this->Locations = Location::get()->filter(['Name' => $tmp]);
-            // You can include any CSS or JS required by your project here.
-            // See: https://docs.silverstripe.org/en/developer_guides/templates/requirements/
+            if (count($tmp)) {
+                $this->Locations = Location::get()->filter(['Name' => $tmp]);
+            }
         }
 
         public function rss($request)
