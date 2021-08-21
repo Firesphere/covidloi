@@ -56,7 +56,8 @@ class Location extends DataObject
     private static $summary_fields = [
         'Name',
         'Help',
-        'Times.Count'
+        'Times.Count',
+        'Added.Nice'
     ];
 
     public static function findOrCreate($data)
