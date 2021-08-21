@@ -172,4 +172,30 @@ class Location extends DataObject
 
         return json_decode($result, 1);
     }
+
+    public function getDescription()
+    {
+        $return = "<b>$this->Name</b><br />$this->Address<br /><br />";
+        foreach ($this->Times() as $time) {
+            $return .= $time->dbObject('Day')->Nice() . ': ';
+            $return .= $time->dbObject('StartTime')->Nice() . ' - ';
+            $return .= $time->dbObject('EndTime')->Nice() . '<br />';
+        }
+        $help = nl2br($this->Help);
+        $help = str_replace(PHP_EOL, "", $help);
+        $return .= "$help";
+
+        return $return;
+    }
+
+
+    public function Date()
+    {
+        return DBDatetime::create()->setValue($this->Times()->Last()->Day . ' ' . $this->Times()->Last()->StartTime);    }
+
+    public function Link()
+    {
+        return sprintf('/#%s', $this->ID);
+    }
+
 }
