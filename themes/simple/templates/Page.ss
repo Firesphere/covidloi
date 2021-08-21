@@ -10,34 +10,10 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link rel="alternate" type="application/rss+xml" title="RSS Feed for Locations of Interest in New Zealand" href="/home/rss" />
    </head>
-<body>
-<nav id="hamnav">
-    <!-- (B) THE HAMBURGER -->
-    <label for="hamburger">&#9776;</label>
-    <input type="checkbox" id="hamburger"/>
-
-    <!-- (C) MENU ITEMS -->
-    <div id="hamitems">
-        <% cached 'PageMenu', $Pages.Max('LastEdited') %>
-            <% loop $Pages %>
-                <% if $ClassName.ShortName = 'RedirectorPage' %>
-                    <a href="$Link" target="_blank">$Menutitle</a>
-                <% else %>
-                    <a href="#menu-$ID" data-toggle="modal" data-target="menu$ID">$Menutitle</a>
-                <% end_if %>
-            <% end_loop %>
-        <% end_cached %>
-    </div>
-</nav>
+<body class="$ClassName.ShortName">
+<% include Nav %>
 <div id="mapid"></div>
-<div id="modal-item" class="modal">
-    <div class="modal-window large">
-        <span class="close" data-dismiss="modal">&times;</span>
-        <h3 id="modal-title"></h3>
-
-        <div id="modal-content"></div>
-    </div>
-</div>
+$Layout
 <script type="text/javascript">
 <% cached 'Locations', $Locations.Count %>
    var locations = [

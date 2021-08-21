@@ -35,7 +35,7 @@ namespace {
          *
          * @var array
          */
-        private static $allowed_actions = ['rss'];
+        private static $allowed_actions = ['rss', 'json'];
 
         protected function init()
         {
@@ -67,7 +67,12 @@ namespace {
 
         public function json($request)
         {
-            $data = $this->getDataItems($request);
+            $this->Locations = Location::get();
+
+            $this->getResponse()->addHeader('Content-Type', 'application/json');
+
+            return $this->renderWith('Json');
+
         }
 
         /**

@@ -20,7 +20,8 @@
 		},
         "expose": [
             "dist",
-            "images"
+            "images",
+            "css"
         ]
 	}
 }
