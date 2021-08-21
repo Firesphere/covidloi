@@ -10,6 +10,7 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
     zoomOffset: -1,
     accessToken: 'pk.eyJ1IjoiZmlyZXNwaGVyZSIsImEiOiJja3Nqb2kzMXUwZjF4MnJyMThmZ2J4NHl6In0.9tPUrRRN07w_ftJGz8I8AQ'
 }).addTo(mymap);
+mymap.getPane('shadowPane').remove();
 
 for (let i = 0; i < locations.length; i++) {
     let marker = new L.marker([locations[i][1], locations[i][2]])
