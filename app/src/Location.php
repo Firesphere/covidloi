@@ -2,6 +2,7 @@
 
 namespace Firesphere\Mini;
 
+use SilverStripe\Control\Director;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Environment;
 use SilverStripe\ORM\DataList;
@@ -202,6 +203,11 @@ class Location extends DataObject
     public function Link()
     {
         return sprintf('/#%s', $this->ID);
+    }
+
+    public function AbsoluteLink()
+    {
+        return Director::absoluteURL($this->Link());
     }
 
 }
