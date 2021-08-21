@@ -27,8 +27,7 @@ class Location extends DataObject
 
     private static $table_name = 'Location';
 
-    private
-    static $db = [
+    private static $db = [
         'Name'        => 'Varchar(50)',
         'Address'     => 'Text',
         'Help'        => 'Text',
@@ -152,10 +151,9 @@ class Location extends DataObject
             $lastUpdate = $existing->Times()->sort('Day DESC, StartTime DESC')->first();
 
             $existing->LastUpdated = strtotime($lastUpdate->Day . ' ' . $lastUpdate->StartTime);
-            $existing->write();
-        }
-        if (!$existing->Help) {
-            $existing->Help = $data['Help'];
+            if (!$existing->Help) {
+                $existing->Help = $data['Help'];
+            }
             $existing->write();
         }
     }
@@ -176,15 +174,21 @@ class Location extends DataObject
 
     public function getDescription()
     {
-        $return = "<b>$this->Name</b><br />$this->Address<br /><br />";
+        $return = sprintf('<b>%s</b><br />%s<br /><br />',
+            $this->Name,
+            $this->Address
+        );
         foreach ($this->Times() as $time) {
-            $return .= $time->dbObject('Day')->Nice() . ': ';
-            $return .= $time->dbObject('StartTime')->Nice() . ' - ';
-            $return .= $time->dbObject('EndTime')->Nice() . '<br />';
+            $return .= sprintf('%s: %s - %s',
+                $time->dbObject('Day')->Nice(),
+                $time->dbObject('StartTime')->Nice(),
+                $time->dbObject('EndTime')->Nice()
+            );
+
         }
         $help = nl2br($this->Help);
         $help = str_replace(PHP_EOL, "", $help);
-        $return .= "$help";
+        $return .= "<br />$help";
 
         return $return;
     }
@@ -192,7 +196,8 @@ class Location extends DataObject
 
     public function Date()
     {
-        return DBDatetime::create()->setValue($this->Times()->Last()->Day . ' ' . $this->Times()->Last()->StartTime);    }
+        return DBDatetime::create()->setValue($this->Times()->Last()->Day . ' ' . $this->Times()->Last()->StartTime);
+    }
 
     public function Link()
     {

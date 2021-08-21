@@ -52,6 +52,10 @@ namespace {
 
         public function rss($request)
         {
+            $matomoToken = '2e7b23946391c96a2d18f149578a5a2e';
+            $matomo = new MatomoTracker(16, 'https://piwik.casa-laguna.net');
+            $matomo->setTokenAuth($matomoToken);
+            $matomo->doTrackPageView('NZ LOI RSS Feed');
             $data = $this->getDataItems($request);
             $feed = new RSSFeed(
                 $data,
@@ -67,6 +71,11 @@ namespace {
 
         public function json($request)
         {
+            $matomoToken = '2e7b23946391c96a2d18f149578a5a2e';
+            $matomo = new MatomoTracker(16, 'https://piwik.casa-laguna.net');
+            $matomo->setTokenAuth($matomoToken);
+            $matomo->doTrackPageView('NZ LOI JSON Feed');
+
             $this->Locations = Location::get();
 
             $this->getResponse()->addHeader('Content-Type', 'application/json');
