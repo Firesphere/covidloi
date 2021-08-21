@@ -90,6 +90,11 @@ class Location extends DataObject
             $existing->write();
         }
 
+        if (!$existing->Help) {
+            $existing->Help = $data['Help'];
+            $existing->write();
+        }
+
         $id = $existing->ID;
 
         LocTime::findOrCreate($data, $id);
@@ -148,8 +153,10 @@ class Location extends DataObject
             $existing->LastUpdated = strtotime($lastUpdate->Day . ' ' . $lastUpdate->StartTime);
             $existing->write();
         }
-
-        return $existing->ID;
+        if (!$existing->Help) {
+            $existing->Help = $data['Help'];
+            $existing->write();
+        }
     }
 
     /**
