@@ -1,7 +1,7 @@
 {
-    "name": "silverstripe/installer",
+    "name": "firesphere/covidloi",
     "type": "silverstripe-recipe",
-    "description": "The SilverStripe Framework Installer",
+    "description": "COVID-19 LOI RSS Feed",
     "require": {
         "php": "^7.1 || ^8",
         "silverstripe/recipe-plugin": "^1.2",

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="$ContentLocale">
 <head>
+<% cached 'Header', $SiteConfig.LastEdited %>
 	<% base_tag %>
 	<title>$SiteConfig.Title</title>
+<% end_cached %>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -44,13 +46,13 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
     accessToken: 'pk.eyJ1IjoiZmlyZXNwaGVyZSIsImEiOiJja3Nqb2kzMXUwZjF4MnJyMThmZ2J4NHl6In0.9tPUrRRN07w_ftJGz8I8AQ'
 }).addTo(mymap);
 
-   for (var i = 0; i < locations.length; i++) {
-  marker = new L.marker([locations[i][1], locations[i][2]])
-    .bindPopup(locations[i][0])
-    .addTo(mymap);
-  if (window.location.hash == '#' + locations[i][3]) {
-      marker.openPopup();
-  }
+for (var i = 0; i < locations.length; i++) {
+    var marker = new L.marker([locations[i][1], locations[i][2]])
+        .bindPopup(locations[i][0])
+        .addTo(mymap);
+    if (window.location.hash === '#' + locations[i][3]) {
+        marker.openPopup();
+    }
 }
         var _paq = window._paq = window._paq || [];
         /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
