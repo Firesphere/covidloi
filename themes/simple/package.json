@@ -1,0 +1,29 @@
+{
+  "scripts": {
+    "watch": "webpack --progress --config=node_modules/laravel-mix/setup/webpack.config.js --watch",
+    "build": "webpack --progress --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "package": "NODE_ENV=production webpack --progress --config=node_modules/laravel-mix/setup/webpack.config.js"
+  },
+  "dependencies": {
+    "@sentry/browser": "^5.28.0",
+    "@sentry/tracing": "^5.28.0",
+    "leaflet": "^1.7.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.1.1",
+    "eslint": "^3.13.1",
+    "eslint-config-airbnb": "^14.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^3.0.2",
+    "eslint-plugin-react": "^6.9.0",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "extractor": "^0.1.2",
+    "laravel-mix": "^4.0",
+    "path": "^0.12.7",
+    "resolve-url-loader": "^2.3",
+    "sass": "^1.17.3",
+    "sass-lint": "^1.10.2",
+    "sass-loader": "7.*",
+    "vue-template-compiler": "^2.6.10"
+  }
+}

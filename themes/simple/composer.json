@@ -19,10 +19,8 @@
 			"dev-master": "3.2.x-dev"
 		},
         "expose": [
-            "css",
-            "images",
-            "javascript",
-            "webfonts"
+            "dist",
+            "images"
         ]
 	}
 }
