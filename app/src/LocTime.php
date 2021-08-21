@@ -29,27 +29,24 @@ class LocTime extends DataObject
         'Location' => Location::class
     ];
 
+    private static $summary_fields = [
+        'Day.Nice',
+        'StartTime.Nice',
+        'EndTime.Nice'
+    ];
+
     public static function findOrCreate($data, $id)
     {
-        $time = explode('-', $data[3]);
-        $start = date('H:i:s', strtotime($time[0]));
-        $end = isset($time[1]) ? date('H:i:s', strtotime($time[1])) : null;
-        $day = date('Y-m-d', strtotime($data[2]));
+        $time = explode('-', $data['Times']);
+        $locTime['Day'] = date('Y-m-d', strtotime($data['Day']));
+        $locTime['StartTime'] = date('H:i:s', strtotime($time[0]));
+        $locTime['EndTime'] = isset($time[1]) ? date('H:i:s', strtotime($time[1])) : null;
+        $locTime['LocationID'] = $id;
 
-        $find = LocTime::get()->filter([
-            'Day'        => $day,
-            'StartTime'  => $start,
-            'EndTime'    => $end,
-            'LocationID' => $id
-        ]);
+        $find = LocTime::get()->filter($locTime);
 
         if (!$find->exists()) {
-            LocTime::create([
-                'Day'        => $day,
-                'StartTime'  => $start,
-                'EndTime'    => $end,
-                'LocationID' => $id
-            ])->write();
+            LocTime::create($locTime)->write();
         }
     }
 
@@ -61,8 +58,14 @@ class LocTime extends DataObject
 
     public function Date()
     {
+        return DBDatetime::create()->setValue($this->Location()->Added);
+    }
+
+    public function LastUpdated()
+    {
         return DBDatetime::create()->setValue($this->Day . ' ' . $this->StartTime);
     }
+
 
     public function getName()
     {

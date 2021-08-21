@@ -2390,16 +2390,16 @@
         },
         {
             "name": "phptek/sentry",
-            "version": "4.0.2",
+            "version": "4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phptek/silverstripe-sentry.git",
-                "reference": "03fe8b4c23dc063971b9d5d33aec3013ea2b51d3"
+                "reference": "a2bdf30659572f585df13e361410e25cbb826599"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phptek/silverstripe-sentry/zipball/03fe8b4c23dc063971b9d5d33aec3013ea2b51d3",
-                "reference": "03fe8b4c23dc063971b9d5d33aec3013ea2b51d3",
+                "url": "https://api.github.com/repos/phptek/silverstripe-sentry/zipball/a2bdf30659572f585df13e361410e25cbb826599",
+                "reference": "a2bdf30659572f585df13e361410e25cbb826599",
                 "shasum": ""
             },
             "require": {
@@ -2446,9 +2446,9 @@
             ],
             "support": {
                 "issues": "https://github.com/phptek/silverstripe-sentry/issues",
-                "source": "https://github.com/phptek/silverstripe-sentry/tree/4.0.2"
+                "source": "https://github.com/phptek/silverstripe-sentry/tree/4.0.4"
             },
-            "time": "2021-07-31T19:55:33+00:00"
+            "time": "2021-08-21T00:08:40+00:00"
         },
         {
             "name": "psr/cache",

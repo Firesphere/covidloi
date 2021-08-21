@@ -6,11 +6,11 @@ use SilverStripe\Core\Convert;
 use SilverStripe\Core\Environment;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBDatetime;
 
 /**
  * Class \Firesphere\Mini\Location
  *
- * @property string $MoHCode
  * @property string $Name
  * @property string $Address
  * @property string $Help
@@ -29,11 +29,10 @@ class Location extends DataObject
 
     private
     static $db = [
-        'MoHCode'     => 'Varchar(50)',
         'Name'        => 'Varchar(50)',
         'Address'     => 'Text',
         'Help'        => 'Text',
-        'Added'       => 'Date',
+        'Added'       => 'Datetime',
         'Lat'         => 'Varchar(50)',
         'Lng'         => 'Varchar(50)',
         'LastUpdated' => 'Datetime'
@@ -44,7 +43,7 @@ class Location extends DataObject
     ];
 
     private static $has_many = [
-        'Times' => LocTime::class
+        'Times' => LocTime::class,
     ];
 
     private static $indexes = [
@@ -54,31 +53,33 @@ class Location extends DataObject
         'Lng'     => true
     ];
 
+    private static $summary_fields = [
+        'Name',
+        'Help',
+        'Times.Count'
+    ];
+
     public static function findOrCreate($data)
     {
-        list($name, $addr) = self::formatNameAddr($data);
-        $filter = ['Address' => $addr];
-        if (strpos('Bus', $name) === 0 || strpos('Train', $name) === 0 || strpos('Public Bus', $name) === 0) {
-            $filter = ['Name' => $name];
+        $data = self::formatNameAddr($data);
+        $filter = ['Address' => $data['Address']];
+        if (strpos('Bus', $data['Name']) === 0 ||
+            strpos('Train', $data['Name']) === 0 ||
+            strpos('Public Bus', $data['Name']) === 0
+        ) {
+            $filter = ['Name' => $data['Name']];
         }
         $existing = Location::get()->filter($filter)->first();
 
         if (!$existing) {
 
-            $existing = Location::create([
-                'Name'    => $name,
-                'Address' => $addr,
-                'Help'    => isset($data[5]) ? mb_convert_encoding($data[4], 'UTF-8') : '',
-                'Added'   => strtotime(end($data)),
-            ]);
+            $existing = Location::create($data);
 
-            if (strpos('Bus ', $name) !== 0) {
-                $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s+New+Zealand&key=%s';
-
-                $result = file_get_contents(sprintf($url, Convert::raw2url($existing->Address),
-                    Environment::getEnv('MAPSKEY')));
-
-                $result = json_decode($result, 1);
+            if (strpos('Bus', $data['Name']) === false &&
+                strpos('Train', $data['Name']) === false &&
+                strpos('Public Bus', $data['Name']) === false
+            ) {
+                $result = self::getLatLng($data);
 
                 if (isset($result['results'][0])) {
                     $existing->Lat = $result['results'][0]['geometry']['location']['lat'];
@@ -86,9 +87,7 @@ class Location extends DataObject
                     $existing->CityID = City::findOrCreate($result['results'][0]['address_components']);
                 }
             }
-            $id = $existing->write();
-
-            $existing = Location::get()->byID($id);
+            $existing->write();
         }
 
         $id = $existing->ID;
@@ -107,58 +106,39 @@ class Location extends DataObject
      */
     protected static function formatNameAddr($data): array
     {
-        if (strpos($data[0], '&') !== false) {
-            $name = trim(mb_convert_encoding($data[0], 'UTF-8', 'HTML-ENTITIES'));
+        if (strpos($data['Name'], '&') !== false) {
+            $name = trim(mb_convert_encoding($data['Name'], 'UTF-8', 'HTML-ENTITIES'));
         } else {
-            $name = trim(mb_convert_encoding($data[0], 'UTF-8'));
+            $name = trim(mb_convert_encoding($data['Name'], 'UTF-8'));
         }
-        if (strpos($data[1], '&') !== false) {
-            $addr = mb_convert_encoding($data[1], 'UTF-8', 'HTML-ENTITIES');
+        if (strpos($data['Address'], '&') !== false) {
+            $addr = mb_convert_encoding($data['Address'], 'UTF-8', 'HTML-ENTITIES');
         } else {
-            $addr = mb_convert_encoding($data[1], 'UTF-8');
+            $addr = mb_convert_encoding($data['Address'], 'UTF-8');
         }
-        $name = trim($name);
-        $addr = trim($addr);
+        $data['Name'] = trim($name);
+        $data['Address'] = trim($addr);
 
-        return array($name, $addr);
+        return $data;
     }
 
     public static function findOrCreateByLatLng($data)
     {
-        list($name, $addr) = self::formatNameAddr($data);
-        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s+New+Zealand&key=%s';
-
-        $result = file_get_contents(sprintf($url, Convert::raw2url($addr),
-            Environment::getEnv('MAPSKEY')));
-
-        $result = json_decode($result, 1);
+        $data = self::formatNameAddr($data);
+        $result = self::getLatLng($data);
 
         if (isset($result['results'][0])) {
-            $lat = $result['results'][0]['geometry']['location']['lat'];
-            $lng = $result['results'][0]['geometry']['location']['lng'];
+            $data['Lat'] = $result['results'][0]['geometry']['location']['lat'];
+            $data['Lng'] = $result['results'][0]['geometry']['location']['lng'];
             $existing = Location::get()
-                ->filter(['Lat' => trim($lat), 'Lng' => trim($lng)]);
+                ->filter(['Lat' => trim($data['Lat']), 'Lng' => trim($data['Lng'])])
+                ->first();
 
-            if (!$existing->exists()) {
-                $existing = Location::create(
-                    [
-                        'Name'    => $name,
-                        'Address' => $addr,
-                        'Help'    => isset($data[5]) ? mb_convert_encoding($data[4], 'UTF-8') : '',
-                        'Added'   => strtotime(end($data)),
-                        'Lat'     => $lat,
-                        'Lng'     => $lng
-                    ]
-                );
+            if (!$existing) {
+                $existing = Location::create($data);
                 $existing->CityID = City::findOrCreate($result['results'][0]['address_components']);
-            } else {
-                $existing = $existing->first();
+                $existing->write();
             }
-
-            $id = $existing->write();
-            $existing = Location::get()->byID($id);
-
-
             $id = $existing->ID;
 
             LocTime::findOrCreate($data, $id);
@@ -168,20 +148,21 @@ class Location extends DataObject
             $existing->LastUpdated = strtotime($lastUpdate->Day . ' ' . $lastUpdate->StartTime);
             $existing->write();
         }
+
+        return $existing->ID;
     }
 
-    public function getDescription()
+    /**
+     * @param array $existing
+     * @return mixed
+     */
+    protected static function getLatLng(Location $existing)
     {
-        $return = "<b>$this->Name</b><br />$this->Address<br /><br />";
-        foreach ($this->Times() as $time) {
-            $return .= $time->dbObject('Day')->Nice() . ': ';
-            $return .= $time->dbObject('StartTime')->Nice() . ' - ';
-            $return .= $time->dbObject('EndTime')->Nice() . '<br />';
-        }
-        $help = nl2br($this->Help);
-        $help = str_replace(PHP_EOL, "", $help);
-        $return .= "<b>$help</b>";
+        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s+New+Zealand&key=%s';
 
-        return $return;
+        $result = file_get_contents(sprintf($url, Convert::raw2url($existing['Address']),
+            Environment::getEnv('MAPSKEY')));
+
+        return json_decode($result, 1);
     }
 }

@@ -72,7 +72,7 @@ namespace {
         {
             $vars = $request->getVars();
             $filter = [];
-            $sort = 'Day DESC, StartTime DESC';
+            $sort = 'Added DESC, Day DESC, StartTime DESC';
             if (count($vars)) {
                 if (isset($vars['location'])) {
                     $filter['Location.City.Name'] = ucfirst($request->getVar('location'));
@@ -83,6 +83,7 @@ namespace {
             }
 
             $data = LocTime::get()
+                ->innerJoin('Location', 'Location.ID = LocTime.LocationID')
                 ->filter($filter)
                 ->sort($sort);
 

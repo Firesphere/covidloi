@@ -17,6 +17,8 @@ class LocationAdmin extends ModelAdmin
 
     private static $managed_models = [
         Location::class,
+        City::class,
+        MoHCode::class,
     ];
 
 }
