@@ -8,6 +8,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="google-site-verification" content="afc6wDN6LeVaxTRWlNRzbdfs7p5VrpAJ5NJRjJZB87Y" />
 	<link rel="alternate" type="application/rss+xml" title="RSS Feed for Locations of Interest in New Zealand" href="/home/rss" />
    </head>
 <body class="$ClassName.ShortName">
