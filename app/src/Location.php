@@ -164,7 +164,7 @@ class Location extends DataObject
      * @param array $existing
      * @return mixed
      */
-    protected static function getLatLng(Location $existing)
+    protected static function getLatLng($existing)
     {
         $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s+New+Zealand&key=%s';
 
