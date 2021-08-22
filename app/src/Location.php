@@ -20,8 +20,11 @@ use SilverStripe\ORM\FieldType\DBDatetime;
  * @property string $Lng
  * @property string $LastUpdated
  * @property int $CityID
+ * @property int $SuburbID
  * @method City City()
+ * @method Suburb Suburb()
  * @method DataList|LocTime[] Times()
+ * @mixin GoogleSitemapExtension
  */
 class Location extends DataObject
 {
@@ -39,7 +42,8 @@ class Location extends DataObject
     ];
 
     private static $has_one = [
-        'City' => City::class
+        'City' => City::class,
+        'Suburb' => Suburb::class
     ];
 
     private static $has_many = [
@@ -58,6 +62,11 @@ class Location extends DataObject
         'Help',
         'Times.Count',
         'Added.Nice'
+    ];
+
+    private static $casting = [
+        'getSpatial' => 'Spatial',
+        'Spatial'    => 'Spatial'
     ];
 
     public static function findOrCreate($data)
@@ -83,9 +92,11 @@ class Location extends DataObject
                 $result = self::getLatLng($data);
 
                 if (isset($result['results'][0])) {
+                    $city = City::findOrCreate($result['results'][0]['address_components']);
                     $existing->Lat = $result['results'][0]['geometry']['location']['lat'];
                     $existing->Lng = $result['results'][0]['geometry']['location']['lng'];
-                    $existing->CityID = City::findOrCreate($result['results'][0]['address_components']);
+                    $existing->CityID = $city[0];
+                    $existing->SuburbID = $city[1];
                 }
             }
             $existing->write();
@@ -141,8 +152,10 @@ class Location extends DataObject
                 ->first();
 
             if (!$existing) {
+                $city = City::findOrCreate($result['results'][0]['address_components']);
                 $existing = Location::create($data);
-                $existing->CityID = City::findOrCreate($result['results'][0]['address_components']);
+                $existing->CityID = $city[0];
+                $existing->SuburbID = $city[1];
                 $existing->write();
             }
             $id = $existing->ID;
@@ -192,6 +205,11 @@ class Location extends DataObject
         $return .= "<br />$help";
 
         return $return;
+    }
+
+    public function getSpatial()
+    {
+        return sprintf('%s,%s', $this->Lat, $this->Lng);
     }
 
 

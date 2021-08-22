@@ -35,6 +35,10 @@ class LocTime extends DataObject
         'EndTime.Nice'
     ];
 
+    private static $casting = [
+        'LastUpdated' => 'Datetime',
+    ];
+
     public static function findOrCreate($data, $id)
     {
         $time = explode('-', $data['Times']);

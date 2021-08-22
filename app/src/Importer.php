@@ -35,6 +35,7 @@ class Importer extends BuildTask
             DB::query('TRUNCATE TABLE `Location`');
             DB::query('TRUNCATE TABLE `LocTime`');
             DB::query('TRUNCATE TABLE `MoHCode`');
+            DB::query('TRUNCATE TABLE `Suburb`');
             DB::query('TRUNCATE TABLE `City`');
         }
         $this->getMoHWebsite();
@@ -80,8 +81,10 @@ class Importer extends BuildTask
             $data = [];
             $i = 0;
             foreach ($tds as $td) {
-                $data[static::$map[$i]] = $td->text;
-                $i++;
+                if (trim($td->innerText)) {
+                    $data[static::$map[$i]] = trim($td->innerText);
+                    $i++;
+                }
             }
             if (count($data)) {
                 $data['Help'] = mb_convert_encoding($data['Help'], 'UTF-8');
