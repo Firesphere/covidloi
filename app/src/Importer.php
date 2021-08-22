@@ -81,10 +81,8 @@ class Importer extends BuildTask
             $data = [];
             $i = 0;
             foreach ($tds as $td) {
-                if (trim($td->innerText)) {
-                    $data[static::$map[$i]] = trim($td->innerText);
-                    $i++;
-                }
+                $data[static::$map[$i]] = trim($td->innerText);
+                $i++;
             }
             if (count($data)) {
                 $data['Help'] = mb_convert_encoding($data['Help'], 'UTF-8');
