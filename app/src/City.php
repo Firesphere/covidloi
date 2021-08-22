@@ -14,6 +14,7 @@ use SilverStripe\ORM\DataObject;
  * @property string $Lat
  * @property string $Lng
  * @method DataList|Location[] Locations()
+ * @method DataList|Suburb[] Suburbs()
  */
 class City extends DataObject
 {

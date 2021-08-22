@@ -14,5 +14,6 @@
                 <% end_if %>
             <% end_loop %>
         <% end_cached %>
+        $SearchForm
     </div>
 </nav>

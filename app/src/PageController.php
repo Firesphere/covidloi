@@ -4,9 +4,15 @@ namespace {
 
     use Firesphere\Mini\Location;
     use Firesphere\Mini\LocTime;
+    use Firesphere\Mini\LOIIndex;
+    use Firesphere\Mini\SearchForm;
+    use Firesphere\SolrSearch\Queries\BaseQuery;
     use SilverStripe\CMS\Controllers\ContentController;
     use SilverStripe\Control\Director;
     use SilverStripe\Control\RSS\RSSFeed;
+    use SilverStripe\Forms\FieldList;
+    use SilverStripe\Forms\FormAction;
+    use SilverStripe\Forms\TextField;
     use SilverStripe\View\Requirements;
 
     /**
@@ -35,7 +41,7 @@ namespace {
          *
          * @var array
          */
-        private static $allowed_actions = ['rss', 'json'];
+        private static $allowed_actions = ['rss', 'json', 'search'];
 
         protected function init()
         {
@@ -109,5 +115,40 @@ namespace {
 
             return $data;
         }
+
+        public function SearchForm()
+        {
+            $fields = FieldList::create([
+                $txt = TextField::create('query', '')
+            ]);
+            $actions = FieldList::create([
+                FormAction::create('search', 'Go')
+            ]);
+            $txt->setAttribute('placeholder', 'Search');
+            $form = SearchForm::create($this, __FUNCTION__, $fields, $actions);
+            $url = '/home/search';
+            $form->setFormAction($url);
+
+            return $form;
+        }
+
+        public function search()
+        {
+            $query = $this->getRequest()->getVars();
+            if (isset($query['query'])) {
+                $this->Query = $query['query'];
+                $this->dataRecord->Title = 'Search';
+                $start = isset($query['start']) ? $query['start'] : 0;
+                $baseQuery = new BaseQuery();
+                $baseQuery->addTerm($query['query']);
+                $baseQuery->setStart($start);
+                $baseQuery->setFacetsMinCount(1);
+                $index = new LOIIndex();
+                $this->Results = $index->doSearch($baseQuery);
+            }
+
+            return $this;
+        }
+
     }
 }

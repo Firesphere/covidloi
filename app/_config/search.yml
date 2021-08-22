@@ -29,7 +29,7 @@ Firesphere\SolrSearch\Indexes\BaseIndex:
     FilterFields:
       - OwnerID
     FacetFields:
-      Firesphere\Miny\City:
+      Firesphere\Mini\City:
         BaseClass: Firesphere\Mini\Location
         Field: City.ID
         Title: City
