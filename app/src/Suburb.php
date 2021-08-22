@@ -42,6 +42,9 @@ class Suburb extends DataObject
 
     public function getSpatial()
     {
+        if (!$this->Lat || !$this->Lng) {
+            $this->Lat = $this->Lng = 0;
+        }
         return sprintf('%s,%s', $this->Lat, $this->Lng);
     }
 
