@@ -35,6 +35,4 @@ Firesphere\SolrSearch\Indexes\BaseIndex:
         Title: City
 Firesphere\SolrSearch\Helpers\Statics:
   typemap:
-    Time: tdate
-    "SilverStripe\\ORM\\FieldType\\DBTime": tdate
-    "DBTime": tdate
+    Spatial: location
