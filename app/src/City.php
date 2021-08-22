@@ -27,7 +27,8 @@ class City extends DataObject
     ];
 
     private static $has_many = [
-        'Locations' => Location::class
+        'Locations' => Location::class,
+        'Suburbs' => Suburb::class
     ];
 
     private static $casting = [
