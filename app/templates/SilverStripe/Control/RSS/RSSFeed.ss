@@ -6,6 +6,7 @@
 		<atom:link href="$Link" rel="self" type="application/rss+xml" />
 		<description>$Description.XML</description>
 
+<% cached $Entries.Max('LastEdited') %>
 		<% loop $Entries %>
 		<item>
 			<title>$Title.XML</title>
@@ -18,5 +19,6 @@
 			<guid>$AbsoluteLink</guid>
 		</item>
 		<% end_loop %>
+<% end_cached %>
 	</channel>
 </rss>
