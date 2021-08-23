@@ -1,38 +1,38 @@
----
-Name: LOISearch
-After:
-  - SolrSearch
----
-Firesphere\SolrSearch\Services\SolrCoreService:
-  # default path settings
-  store:
-    mode: 'file'
-    path: '/var/solr/data'
-  cpucores: 4
-Firesphere\SolrSearch\Indexes\BaseIndex:
-  LOIIndex:
-    Classes:
-      - Page
-      - Firesphere\Mini\Location
-    FulltextFields:
-      - Name
-      - Address
-      - Help
-      - Lat
-      - Lng
-      - City.Title
-      - City.Spatial
-      - Suburb.Title
-      - Suburb.Spatial
-      - Times.LastUpdated
-      - Spatial
-    FilterFields:
-      - OwnerID
-    FacetFields:
-      Firesphere\Mini\City:
-        BaseClass: Firesphere\Mini\Location
-        Field: City.ID
-        Title: City
-Firesphere\SolrSearch\Helpers\Statics:
-  typemap:
-    Spatial: location
+#---
+#Name: LOISearch
+#After:
+#  - SolrSearch
+#---
+#Firesphere\SolrSearch\Services\SolrCoreService:
+#  # default path settings
+#  store:
+#    mode: 'file'
+#    path: '/var/solr/data'
+#  cpucores: 4
+#Firesphere\SolrSearch\Indexes\BaseIndex:
+#  LOIIndex:
+#    Classes:
+#      - Page
+#      - Firesphere\Mini\Location
+#    FulltextFields:
+#      - Name
+#      - Address
+#      - Help
+#      - Lat
+#      - Lng
+#      - City.Title
+#      - City.Spatial
+#      - Suburb.Title
+#      - Suburb.Spatial
+#      - Times.LastUpdated
+#      - Spatial
+#    FilterFields:
+#      - OwnerID
+#    FacetFields:
+#      Firesphere\Mini\City:
+#        BaseClass: Firesphere\Mini\Location
+#        Field: City.ID
+#        Title: City
+#Firesphere\SolrSearch\Helpers\Statics:
+#  typemap:
+#    Spatial: location
