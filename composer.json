@@ -15,8 +15,7 @@
         "steadlane/silverstripe-cloudflare": "^2.0",
         "phptek/sentry": "^4.0",
         "matomo/matomo-php-tracker": "^3.0",
-        "silverstripe/googlesitemaps": "^2.2",
-        "firesphere/solr-search": "^1"
+        "silverstripe/googlesitemaps": "^2.2"
     },
     "require-dev": {
         "sminnee/phpunit": "^5.7",

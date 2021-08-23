@@ -106,43 +106,9 @@ namespace {
                 $list = $list->innerJoin('Location', 'Location.ID = LocTime.LocationID');
                 $sort = 'Added DESC, Day DESC, StartTime DESC';
             }
+
             return $list->filter($filter)
                 ->sort($sort);
         }
-
-        public function SearchForm()
-        {
-            $fields = FieldList::create([
-                $txt = TextField::create('query', '')
-            ]);
-            $actions = FieldList::create([
-                FormAction::create('search', 'Go')
-            ]);
-            $txt->setAttribute('placeholder', 'Search');
-            $form = SearchForm::create($this, __FUNCTION__, $fields, $actions);
-            $url = '/home/search';
-            $form->setFormAction($url);
-
-            return $form;
-        }
-
-        public function search()
-        {
-            $query = $this->getRequest()->getVars();
-            if (isset($query['query'])) {
-                $this->Query = $query['query'];
-                $this->dataRecord->Title = 'Search';
-                $start = isset($query['start']) ? $query['start'] : 0;
-                $baseQuery = new BaseQuery();
-                $baseQuery->addTerm($query['query']);
-                $baseQuery->setStart($start);
-                $baseQuery->setFacetsMinCount(1);
-                $index = new LOIIndex();
-                $this->Results = $index->doSearch($baseQuery);
-            }
-
-            return $this;
-        }
-
     }
 }

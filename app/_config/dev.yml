@@ -7,6 +7,7 @@ SilverLeague\IDEAnnotator\DataObjectAnnotator:
   use_short_name: true
   enabled_modules:
     - app
+    - elliotsawyer/nzstreets
 LeKoala\DebugBar\DebugBar:
   enable_storage: true
   auto_debug: false
