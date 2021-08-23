@@ -10,6 +10,7 @@ namespace {
     use SilverStripe\CMS\Controllers\ContentController;
     use SilverStripe\Control\Director;
     use SilverStripe\Control\RSS\RSSFeed;
+    use SilverStripe\Core\Environment;
     use SilverStripe\Forms\FieldList;
     use SilverStripe\Forms\FormAction;
     use SilverStripe\Forms\TextField;
@@ -49,6 +50,7 @@ namespace {
             Requirements::set_force_js_to_bottom(true);
             Requirements::javascript('themes/simple/dist/main.js');
             Requirements::css('themes/simple/dist/main.css');
+            RSSFeed::linkToFeed('/home/rss', 'NZ LOI RSS Feed');
 
             $this->Pages = Page::get()->filter(['ShowInMenus' => true]);
             $this->Locations = Location::get()
@@ -77,10 +79,12 @@ namespace {
 
         public function json($request)
         {
-            $matomoToken = '2e7b23946391c96a2d18f149578a5a2e';
-            $matomo = new MatomoTracker(16, 'https://piwik.casa-laguna.net');
-            $matomo->setTokenAuth($matomoToken);
-            $matomo->doTrackPageView('NZ LOI JSON Feed');
+            if (Director::isLive()) {
+                $matomoToken = Environment::getEnv('MATOMOTOKEN');
+                $matomo = new MatomoTracker(16, 'https://piwik.casa-laguna.net');
+                $matomo->setTokenAuth($matomoToken);
+                $matomo->doTrackPageView('NZ LOI JSON Feed');
+            }
 
             $this->Locations = Location::get();
 
@@ -96,24 +100,18 @@ namespace {
          */
         protected function getDataItems($request): \SilverStripe\ORM\DataList
         {
-            $vars = $request->getVars();
+            $vars = $request->allParams();
             $filter = [];
             $sort = 'Added DESC, Day DESC, StartTime DESC';
-            if (count($vars)) {
-                if (isset($vars['location'])) {
-                    $filter['Location.City.Name'] = ucfirst($request->getVar('location'));
-                }
-                if (isset($vars['date'])) {
-                    $filter['Day'] = date('2021-m-d', strtotime($vars['date']));
-                }
+            $list = LocTime::get();
+            if ($vars['ID'] == 'location') {
+                $filter['Location.City.Name'] = ucfirst($request->param('OtherID'));
+            } else {
+                $list = $list->innerJoin('Location', 'Location.ID = LocTime.LocationID');
+                $sort = 'Added DESC, Day DESC, StartTime DESC';
             }
-
-            $data = LocTime::get()
-                ->innerJoin('Location', 'Location.ID = LocTime.LocationID')
-                ->filter($filter)
+            return $list->filter($filter)
                 ->sort($sort);
-
-            return $data;
         }
 
         public function SearchForm()
