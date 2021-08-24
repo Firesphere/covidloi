@@ -32,7 +32,7 @@ class Location extends DataObject
     private static $table_name = 'Location';
 
     private static $db = [
-        'Name'        => 'Varchar(50)',
+        'Name'        => 'Varchar(255)',
         'Address'     => 'Text',
         'Help'        => 'Text',
         'Added'       => 'Datetime',
