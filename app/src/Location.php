@@ -73,9 +73,10 @@ class Location extends DataObject
     {
         $data = self::formatNameAddr($data);
         $filter = ['Address' => $data['Address']];
-        if (strpos('Bus', $data['Name']) === 0 ||
-            strpos('Train', $data['Name']) === 0 ||
-            strpos('Public Bus', $data['Name']) === 0
+        if (strpos($data['Name'], 'Bus') === 0 ||
+            strpos($data['Name'], 'Train') === 0 ||
+            strpos($data['Name'], 'Public Bus') === 0 ||
+            strpos($data['Name'], 'Flight') === 0
         ) {
             $filter = ['Name' => $data['Name']];
         }
@@ -85,9 +86,10 @@ class Location extends DataObject
 
             $existing = Location::create($data);
 
-            if (strpos('Bus', $data['Name']) === false &&
-                strpos('Train', $data['Name']) === false &&
-                strpos('Public Bus', $data['Name']) === false
+            if (strpos($data['Name'], 'Bus') === false &&
+                strpos($data['Name'], 'Train') === false &&
+                strpos($data['Name'], 'Public Bus') === false &&
+                strpos($data['Name'], 'Flight') === false
             ) {
                 $result = self::getLatLng($data);
 
@@ -102,19 +104,21 @@ class Location extends DataObject
             $existing->write();
         }
 
-        if (!$existing->Help) {
-            $existing->Help = $data['Help'];
-            $existing->write();
-        }
-
         $id = $existing->ID;
 
-        LocTime::findOrCreate($data, $id);
+        $new = LocTime::findOrCreate($data, $id);
 
-        $lastUpdate = $existing->Times()->sort('Day DESC, StartTime DESC')->first();
+        if ($new || !$existing->Help) {
+            echo "new time or help " . $data['Name'];
 
-        $existing->LastUpdated = strtotime($lastUpdate->Day . ' ' . $lastUpdate->StartTime);
-        $existing->write();
+            $lastUpdate = $existing->Times()->sort('Day DESC, StartTime DESC')->first();
+
+            $existing->LastUpdated = strtotime($lastUpdate->Day . ' ' . $lastUpdate->StartTime);
+            if (!$existing->Help) {
+                $existing->Help = $data['Help'];
+            }
+            $existing->write();
+        }
     }
 
     /**
@@ -160,15 +164,17 @@ class Location extends DataObject
             }
             $id = $existing->ID;
 
-            LocTime::findOrCreate($data, $id);
+            $new = LocTime::findOrCreate($data, $id);
 
-            $lastUpdate = $existing->Times()->sort('Day DESC, StartTime DESC')->first();
+            if ($new || !$existing->Help) {
+                $lastUpdate = $existing->Times()->sort('Day DESC, StartTime DESC')->first();
 
-            $existing->LastUpdated = strtotime($lastUpdate->Day . ' ' . $lastUpdate->StartTime);
-            if (!$existing->Help) {
-                $existing->Help = $data['Help'];
+                $existing->LastUpdated = strtotime($lastUpdate->Day . ' ' . $lastUpdate->StartTime);
+                if (!$existing->Help) {
+                    $existing->Help = $data['Help'];
+                }
+                $existing->write();
             }
-            $existing->write();
         }
     }
 

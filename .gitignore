@@ -10,3 +10,5 @@
 node_modules
 /themes/simple/node_modules
 /silverstripe-solr-spatial
+/nzstreets
+/nz-street-address.csv

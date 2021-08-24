@@ -51,7 +51,10 @@ class LocTime extends DataObject
 
         if (!$find->exists()) {
             LocTime::create($locTime)->write();
+            return true;
         }
+
+        return false;
     }
 
 
