@@ -107,7 +107,7 @@ class Importer extends BuildTask
                     'Times'   => date('H:i:s',
                             strtotime(str_replace('/', '-', $location['properties']['Start']))) . '-' .
                         date('H:i:s', strtotime(str_replace('/', '-', $location['properties']['End']))),
-                    'Help'    => $location['properties']['Information'],
+                    'Help'    => $location['properties']['Advice'],
                     'Added'   => date('Y-m-d H:i:s')
                 ];
                 $mohCodes[] = $location['properties']['id'];
