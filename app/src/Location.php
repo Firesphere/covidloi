@@ -42,7 +42,7 @@ class Location extends DataObject
     ];
 
     private static $has_one = [
-        'City' => City::class,
+        'City'   => City::class,
         'Suburb' => Suburb::class
     ];
 
@@ -51,10 +51,10 @@ class Location extends DataObject
     ];
 
     private static $indexes = [
-        'MoHCode' => true,
-        'Name'    => true,
-        'Lat'     => true,
-        'Lng'     => true
+        'Name'        => true,
+        'Lat'         => true,
+        'Lng'         => true,
+        'LastUpdated' => true
     ];
 
     private static $summary_fields = [
@@ -184,7 +184,7 @@ class Location extends DataObject
      */
     protected static function getLatLng($existing)
     {
-        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s+New+Zealand&key=%s';
+        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s,New%%20Zealand&key=%s';
 
         $result = file_get_contents(sprintf($url, Convert::raw2url($existing['Address']),
             Environment::getEnv('MAPSKEY')));
@@ -199,7 +199,7 @@ class Location extends DataObject
             $this->Address
         );
         foreach ($this->Times() as $time) {
-            $return .= sprintf('%s: %s - %s',
+            $return .= sprintf('%s: %s - %s<br />',
                 $time->dbObject('Day')->Nice(),
                 $time->dbObject('StartTime')->Nice(),
                 $time->dbObject('EndTime')->Nice()
@@ -219,6 +219,7 @@ class Location extends DataObject
             $this->Lat = 0;
             $this->Lng = 0;
         }
+
         return sprintf('%s,%s', $this->Lat, $this->Lng);
     }
 

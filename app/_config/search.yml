@@ -20,9 +20,9 @@ Firesphere\SolrSearch\Indexes\BaseIndex:
       - Help
       - Lat
       - Lng
-      - City.Title
+      - City.Name
       - City.Spatial
-      - Suburb.Title
+      - Suburb.Name
       - Suburb.Spatial
       - Times.LastUpdated
       - Spatial

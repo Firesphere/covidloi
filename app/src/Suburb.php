@@ -69,8 +69,11 @@ class Suburb extends DataObject
         if (!isset($suburb) || is_array($suburb)) {
             return;
         }
+        if (!isset($postal) || is_array($postal)) {
+            return;
+        }
 
-        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s,New+Zealand&key=%s';
+        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s,New%%20Zealand&key=%s';
 
         $result = file_get_contents(sprintf($url, Convert::raw2url(sprintf('%s,%s,%s', $suburb, $postal, $city->Name)),
             Environment::getEnv('MAPSKEY')));
