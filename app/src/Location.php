@@ -109,7 +109,6 @@ class Location extends DataObject
         $new = LocTime::findOrCreate($data, $id);
 
         if ($new || !$existing->Help) {
-            echo "new time or help " . $data['Name'];
 
             $lastUpdate = $existing->Times()->sort('Day DESC, StartTime DESC')->first();
 
