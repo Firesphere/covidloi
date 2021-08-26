@@ -86,7 +86,7 @@ class Importer extends BuildTask
             }
             if (count($data)) {
                 $data['Help'] = mb_convert_encoding($data['Help'], 'UTF-8');
-                $data['Added'] = $time->getValue();
+//                $data['Added'] = $time->getValue();
                 Location::findOrCreate($data);
             }
         }
