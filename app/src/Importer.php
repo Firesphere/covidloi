@@ -74,7 +74,6 @@ class Importer extends BuildTask
         $dom = new \PHPHtmlParser\Dom();
         $dom->loadStr($content);
         $body = $dom->find('div.main-container.container');
-        $time = $this->getLastUpdated($body);
         $trs = $body->find('tr');
         foreach ($trs as $tr) {
             $tds = $tr->find('td');
@@ -86,7 +85,10 @@ class Importer extends BuildTask
             }
             if (count($data)) {
                 $data['Help'] = mb_convert_encoding($data['Help'], 'UTF-8');
-//                $data['Added'] = $time->getValue();
+                $dt = explode(' ', $data['Added']);
+                $dt = date('Y-m-d ', strtotime($dt[0] . ' ' . $dt[1] . ' 2021')) .
+                    date('H:i:s', strtotime($dt[2] . $dt[3]));
+                $data['Added'] = $dt;
                 Location::findOrCreate($data);
             }
         }
