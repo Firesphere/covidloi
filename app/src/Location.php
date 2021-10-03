@@ -2,12 +2,15 @@
 
 namespace Firesphere\Mini;
 
+use SilverStripe\Assets\Image;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Environment;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\View\Parsers\URLSegmentFilter;
+use Wilr\GoogleSitemaps\Extensions\GoogleSitemapExtension;
 
 /**
  * Class \Firesphere\Mini\Location
@@ -21,8 +24,10 @@ use SilverStripe\ORM\FieldType\DBDatetime;
  * @property string $LastUpdated
  * @property int $CityID
  * @property int $SuburbID
+ * @property int $MapID
  * @method City City()
  * @method Suburb Suburb()
+ * @method Image Map()
  * @method DataList|LocTime[] Times()
  * @mixin GoogleSitemapExtension
  */
@@ -43,7 +48,8 @@ class Location extends DataObject
 
     private static $has_one = [
         'City'   => City::class,
-        'Suburb' => Suburb::class
+        'Suburb' => Suburb::class,
+        'Map'    => Image::class,
     ];
 
     private static $has_many = [
@@ -64,10 +70,20 @@ class Location extends DataObject
         'Added.Nice'
     ];
 
+    private static $owns = [
+        'Map'
+    ];
+
     private static $casting = [
         'getSpatial' => 'Spatial',
         'Spatial'    => 'Spatial'
     ];
+
+    public function onBeforeWrite()
+    {
+        $this->getMapData();
+        parent::onBeforeWrite();
+    }
 
     public static function findOrCreate($data)
     {
@@ -101,6 +117,7 @@ class Location extends DataObject
                     $existing->SuburbID = $city[1];
                 }
             }
+
             $existing->write();
         }
 
@@ -191,6 +208,33 @@ class Location extends DataObject
         return json_decode($result, 1);
     }
 
+    /**
+     * @throws \SilverStripe\ORM\ValidationException
+     */
+    protected function getMapData(): void
+    {
+        if ($this->Lat && $this->Lng && !$this->MapID) {
+            $file = Image::create();
+            $url = "https://maps.googleapis.com/maps/api/staticmap?";
+            $params = [
+                'center'  => sprintf('%s, %s, New Zealand', $this->Address, $this->City()->Name),
+                'zoom'    => 13,
+                'size'    => '600x300',
+                'maptype' => 'roadmap',
+                'markers' => sprintf('color:red|label:L|%s,%s', $this->Lat, $this->Lng),
+                'key'     => Environment::getEnv('MAPSKEY')
+            ];
+            $fName = URLSegmentFilter::singleton()->filter($this->Name) . '.png';
+            $fContent = file_get_contents(sprintf('%s%s', $url, http_build_query($params)));
+            $file->setFromString($fContent, $fName);
+            $file->write();
+            $file->publishSingle();
+            $file->publishFile();
+
+            $this->MapID = $file->ID;
+        }
+    }
+
     public function getDescription()
     {
         $return = sprintf('<b>%s</b><br />%s<br /><br />',
@@ -210,6 +254,12 @@ class Location extends DataObject
         $return .= "<br />$help";
 
         return $return;
+    }
+
+    public function getRSSDescription()
+    {
+        return $this->getDescription() . sprintf("<br /><img src='%s' />", $this->Map()->getAbsoluteURL());
+
     }
 
     public function getSpatial()
