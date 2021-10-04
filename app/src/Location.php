@@ -200,10 +200,12 @@ class Location extends DataObject
      */
     protected static function getLatLng($existing)
     {
-        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s,New%%20Zealand&key=%s';
-
-        $result = file_get_contents(sprintf($url, Convert::raw2url($existing['Address']),
-            Environment::getEnv('MAPSKEY')));
+        $url = 'https://maps.googleapis.com/maps/api/geocode/json?%s';
+        $params = [
+            'address' => Convert::raw2url($existing['Address']),
+            'key'     => Environment::getEnv('MAPSKEY')
+        ];
+        $result = file_get_contents(sprintf('%s%s', $url, http_build_query($params)));
 
         return json_decode($result, 1);
     }
@@ -211,7 +213,7 @@ class Location extends DataObject
     /**
      * @throws \SilverStripe\ORM\ValidationException
      */
-    protected function getMapData(): void
+    public function getMapData(): void
     {
         if ($this->Lat && $this->Lng && !$this->MapID) {
             $file = Image::create();
