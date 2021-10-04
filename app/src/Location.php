@@ -9,8 +9,6 @@ use SilverStripe\Core\Environment;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverStripe\ORM\FieldType\DBHTMLText;
-use SilverStripe\View\HTML;
 use SilverStripe\View\Parsers\URLSegmentFilter;
 use Wilr\GoogleSitemaps\Extensions\GoogleSitemapExtension;
 
@@ -230,18 +228,14 @@ class Location extends DataObject
                 'markers' => sprintf('color:red|label:L|%s,%s', $this->Lat, $this->Lng),
                 'key'     => Environment::getEnv('MAPSKEY')
             ];
-            try {
-                $fName = URLSegmentFilter::singleton()->filter($this->Name) . '.png';
-                $fContent = file_get_contents(sprintf('%s%s', $url, http_build_query($params)));
-                $file->setFromString($fContent, $fName);
-                $file->write();
-                $file->publishSingle();
-                $file->publishFile();
+            $fName = URLSegmentFilter::singleton()->filter($this->Name) . '.png';
+            $fContent = file_get_contents(sprintf('%s%s', $url, http_build_query($params)));
+            $file->setFromString($fContent, $fName);
+            $file->write();
+            $file->publishSingle();
+            $file->publishFile();
 
-                $this->MapID = $file->ID;
-            } catch (\Exception $e) {
-                $this->MapID = 0;
-            }
+            $this->MapID = $file->ID;
         }
     }
 
@@ -301,7 +295,7 @@ class Location extends DataObject
     public function getImagePreview()
     {
         if ($this->Map()->exists()) {
-            return $this->Map()->Fill(300, 150);
+            return $this->Map()->Fill(200, 100);
         }
     }
 
