@@ -221,7 +221,7 @@ class Location extends DataObject
             $address = sprintf('%s, %s, New Zealand', $this->Address, $this->City()->Name);
             $url = "https://maps.googleapis.com/maps/api/staticmap?";
             $params = [
-                'center'  => mb_convert_encoding($address, 'UTF-8', 'HTML-ENTITIES'),
+                'center'  => $address,
                 'zoom'    => 13,
                 'size'    => '600x300',
                 'maptype' => 'roadmap',
