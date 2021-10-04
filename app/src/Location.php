@@ -226,14 +226,18 @@ class Location extends DataObject
                 'markers' => sprintf('color:red|label:L|%s,%s', $this->Lat, $this->Lng),
                 'key'     => Environment::getEnv('MAPSKEY')
             ];
-            $fName = URLSegmentFilter::singleton()->filter($this->Name) . '.png';
-            $fContent = file_get_contents(sprintf('%s%s', $url, http_build_query($params)));
-            $file->setFromString($fContent, $fName);
-            $file->write();
-            $file->publishSingle();
-            $file->publishFile();
+            try {
+                $fName = URLSegmentFilter::singleton()->filter($this->Name) . '.png';
+                $fContent = file_get_contents(sprintf('%s%s', $url, http_build_query($params)));
+                $file->setFromString($fContent, $fName);
+                $file->write();
+                $file->publishSingle();
+                $file->publishFile();
 
-            $this->MapID = $file->ID;
+                $this->MapID = $file->ID;
+            } catch (\Exception $e) {
+                $this->MapID = 0;
+            }
         }
     }
 
