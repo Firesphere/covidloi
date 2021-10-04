@@ -9,6 +9,8 @@ use SilverStripe\Core\Environment;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\ORM\FieldType\DBHTMLText;
+use SilverStripe\View\HTML;
 use SilverStripe\View\Parsers\URLSegmentFilter;
 use Wilr\GoogleSitemaps\Extensions\GoogleSitemapExtension;
 
@@ -65,9 +67,10 @@ class Location extends DataObject
 
     private static $summary_fields = [
         'Name',
-        'Help',
+        'Address',
         'Times.Count',
-        'Added.Nice'
+        'Added.Nice',
+        'ImagePreview'
     ];
 
     private static $owns = [
@@ -217,9 +220,10 @@ class Location extends DataObject
     {
         if ($this->Lat && $this->Lng && !$this->MapID) {
             $file = Image::create();
+            $address = sprintf('%s, %s, New Zealand', $this->Address, $this->City()->Name);
             $url = "https://maps.googleapis.com/maps/api/staticmap?";
             $params = [
-                'center'  => sprintf('%s, %s, New Zealand', $this->Address, $this->City()->Name),
+                'center'  => mb_convert_encoding($address, 'UTF-8', 'HTML-ENTITIES'),
                 'zoom'    => 13,
                 'size'    => '600x300',
                 'maptype' => 'roadmap',
@@ -292,6 +296,13 @@ class Location extends DataObject
     public function AbsoluteLink()
     {
         return Director::absoluteURL($this->Link());
+    }
+
+    public function getImagePreview()
+    {
+        if ($this->Map()->exists()) {
+            return $this->Map()->Fill(300, 150);
+        }
     }
 
 }
