@@ -13,10 +13,8 @@ class LocationMapTask extends BuildTask
 
         /** @var Location $location */
         foreach ($locations as $location) {
-            if (!$location->MapID) {
-                $location->getMapData();
-                $location->write();
-            }
+            $location->getMapData();
+            $location->write();
         }
     }
 }

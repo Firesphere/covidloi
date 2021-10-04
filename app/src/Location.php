@@ -216,7 +216,7 @@ class Location extends DataObject
      */
     public function getMapData(): void
     {
-        if ($this->Lat && $this->Lng && !$this->MapID) {
+        if ($this->Lat && $this->Lng && !$this->Map()->exists()) {
             $file = Image::create();
             $address = sprintf('%s, %s, New Zealand', $this->Address, $this->City()->Name);
             $url = "https://maps.googleapis.com/maps/api/staticmap?";
