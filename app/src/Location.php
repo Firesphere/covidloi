@@ -201,7 +201,7 @@ class Location extends DataObject
      */
     protected static function getLatLng($existing)
     {
-        $url = 'https://maps.googleapis.com/maps/api/geocode/json?%s';
+        $url = 'https://maps.googleapis.com/maps/api/geocode/json?';
         $params = [
             'address' => Convert::raw2url($existing['Address']),
             'key'     => Environment::getEnv('MAPSKEY')
