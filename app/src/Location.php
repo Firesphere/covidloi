@@ -2,12 +2,15 @@
 
 namespace Firesphere\Mini;
 
+use SilverStripe\Assets\Image;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Environment;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\View\Parsers\URLSegmentFilter;
+use Wilr\GoogleSitemaps\Extensions\GoogleSitemapExtension;
 
 /**
  * Class \Firesphere\Mini\Location
@@ -21,8 +24,10 @@ use SilverStripe\ORM\FieldType\DBDatetime;
  * @property string $LastUpdated
  * @property int $CityID
  * @property int $SuburbID
+ * @property int $MapID
  * @method City City()
  * @method Suburb Suburb()
+ * @method Image Map()
  * @method DataList|LocTime[] Times()
  * @mixin GoogleSitemapExtension
  */
@@ -43,7 +48,8 @@ class Location extends DataObject
 
     private static $has_one = [
         'City'   => City::class,
-        'Suburb' => Suburb::class
+        'Suburb' => Suburb::class,
+        'Map'    => Image::class,
     ];
 
     private static $has_many = [
@@ -59,15 +65,26 @@ class Location extends DataObject
 
     private static $summary_fields = [
         'Name',
-        'Help',
+        'Address',
         'Times.Count',
-        'Added.Nice'
+        'Added.Nice',
+        'ImagePreview'
+    ];
+
+    private static $owns = [
+        'Map'
     ];
 
     private static $casting = [
         'getSpatial' => 'Spatial',
         'Spatial'    => 'Spatial'
     ];
+
+    public function onBeforeWrite()
+    {
+        $this->getMapData();
+        parent::onBeforeWrite();
+    }
 
     public static function findOrCreate($data)
     {
@@ -101,6 +118,7 @@ class Location extends DataObject
                     $existing->SuburbID = $city[1];
                 }
             }
+
             $existing->write();
         }
 
@@ -183,12 +201,42 @@ class Location extends DataObject
      */
     protected static function getLatLng($existing)
     {
-        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s,New%%20Zealand&key=%s';
-
-        $result = file_get_contents(sprintf($url, Convert::raw2url($existing['Address']),
-            Environment::getEnv('MAPSKEY')));
+        $url = 'https://maps.googleapis.com/maps/api/geocode/json?';
+        $params = [
+            'address' => Convert::raw2url($existing['Address']),
+            'key'     => Environment::getEnv('MAPSKEY')
+        ];
+        $result = file_get_contents(sprintf('%s%s', $url, http_build_query($params)));
 
         return json_decode($result, 1);
+    }
+
+    /**
+     * @throws \SilverStripe\ORM\ValidationException
+     */
+    public function getMapData(): void
+    {
+        if ($this->Lat && $this->Lng && !$this->Map()->exists()) {
+            $file = Image::create();
+            $address = sprintf('%s, %s, New Zealand', $this->Address, $this->City()->Name);
+            $url = "https://maps.googleapis.com/maps/api/staticmap?";
+            $params = [
+                'center'  => $address,
+                'zoom'    => 13,
+                'size'    => '600x300',
+                'maptype' => 'roadmap',
+                'markers' => sprintf('color:red|label:L|%s,%s', $this->Lat, $this->Lng),
+                'key'     => Environment::getEnv('MAPSKEY')
+            ];
+            $fName = URLSegmentFilter::singleton()->filter($this->ID . '-' . $this->Name) . '.png';
+            $fContent = file_get_contents(sprintf('%s%s', $url, http_build_query($params)));
+            $file->setFromString($fContent, $fName);
+            $file->write();
+            $file->publishSingle();
+            $file->publishFile();
+
+            $this->MapID = $file->ID;
+        }
     }
 
     public function getDescription()
@@ -210,6 +258,12 @@ class Location extends DataObject
         $return .= "<br />$help";
 
         return $return;
+    }
+
+    public function getRSSDescription()
+    {
+        return $this->getDescription() . sprintf("<br /><img src='%s' />", $this->Map()->getAbsoluteURL());
+
     }
 
     public function getSpatial()
@@ -236,6 +290,13 @@ class Location extends DataObject
     public function AbsoluteLink()
     {
         return Director::absoluteURL($this->Link());
+    }
+
+    public function getImagePreview()
+    {
+        if ($this->Map()->exists()) {
+            return $this->Map()->Fill(200, 100);
+        }
     }
 
 }

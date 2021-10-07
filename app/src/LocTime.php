@@ -81,13 +81,23 @@ class LocTime extends DataObject
 
     public function getDescription()
     {
+        $html = "<h3>%s</h3>
+<b>Date:</b> %s<br />
+<b>Time:</b> %s-%s<br />
+<b>What to do:</b><br />
+%s<br />
+<img src='%s' alt='Map for %s' />";
+        
         return
-            sprintf("<h3>%s</h3><b>Date:</b> %s<br /><b>Time:</b> %s-%s<br /><b>What to do:</b><br />%s",
+            sprintf(
+                $html,
                 htmlspecialchars_decode($this->Location()->Address),
                 $this->dbObject('Day')->Nice(),
                 $this->dbObject('StartTime')->Nice(),
                 $this->dbObject('EndTime')->Nice(),
-                htmlspecialchars_decode(trim($this->Location()->Help))
+                htmlspecialchars_decode(trim($this->Location()->Help)),
+                $this->Location()->Map()->AbsoluteLink(),
+                htmlspecialchars_decode($this->Location()->Name)
             );
     }
 }

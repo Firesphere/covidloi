@@ -4,6 +4,7 @@
     "description": "COVID-19 LOI RSS Feed",
     "require": {
         "php": "^7.1 || ^8",
+        "ext-json": "*",
         "silverstripe/recipe-plugin": "^1.2",
         "silverstripe/recipe-cms": "4.8.0@stable",
         "silverstripe-themes/simple": "~3.2.0",
