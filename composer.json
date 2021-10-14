@@ -5,25 +5,25 @@
     "require": {
         "php": "^7.1 || ^8",
         "ext-json": "*",
-        "silverstripe/recipe-plugin": "^1.2",
+        "silverstripe/recipe-plugin": "^1",
         "silverstripe/recipe-cms": "^4",
         "silverstripe-themes/simple": "^3",
         "silverstripe/login-forms": "^4",
         "paquettg/php-html-parser": "^3",
         "silverstripe/mfa": "^4",
-        "silverstripe/totp-authenticator": "^4.1",
-        "silverstripe/webauthn-authenticator": "^4.2",
-        "steadlane/silverstripe-cloudflare": "^2.0",
-        "phptek/sentry": "^4.0",
-        "matomo/matomo-php-tracker": "^3.0",
-        "silverstripe/googlesitemaps": "^2.2",
-        "firesphere/solr-search": "^1.1"
+        "silverstripe/totp-authenticator": "^4",
+        "silverstripe/webauthn-authenticator": "^4",
+        "steadlane/silverstripe-cloudflare": "^2",
+        "phptek/sentry": "^4",
+        "matomo/matomo-php-tracker": "^3",
+        "silverstripe/googlesitemaps": "^2",
+        "firesphere/solr-search": "^1"
     },
     "require-dev": {
         "sminnee/phpunit": "^5.7",
         "sminnee/phpunit-mock-objects": "^3.4.5",
         "silverleague/ideannotator": "^3",
-        "lekoala/silverstripe-debugbar": "^2.0.6"
+        "lekoala/silverstripe-debugbar": "^2"
     },
     "extra": {
         "resources-dir": "_resources",
