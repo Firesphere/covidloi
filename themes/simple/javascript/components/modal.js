@@ -22,3 +22,8 @@ if (!document.getElementsByClassName('GenericPage').length) {
         }
     }, false);
 }
+if (!window.location.hash) {
+    document.getElementById('modal-title').innerHTML = pagecontent['menu1'].Title;
+    document.getElementById('modal-content').innerHTML = pagecontent['menu1'].Content;
+    document.getElementById('modal-item').classList.add('open');
+}
