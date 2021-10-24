@@ -11,11 +11,12 @@ namespace {
     use SilverStripe\CMS\Controllers\ContentController;
     use SilverStripe\Control\Director;
     use SilverStripe\Control\RSS\RSSFeed;
-    use SilverStripe\Core\Environment;
     use SilverStripe\Forms\DropdownField;
     use SilverStripe\Forms\FieldList;
     use SilverStripe\Forms\FormAction;
     use SilverStripe\Forms\TextField;
+    use SilverStripe\ORM\DataList;
+    use SilverStripe\ORM\FieldType\DBHTMLText;
     use SilverStripe\View\Requirements;
 
     /**
@@ -44,7 +45,7 @@ namespace {
          *
          * @var array
          */
-        private static $allowed_actions = ['rss', 'json', 'search'];
+        private static $allowed_actions = ['rss', 'search'];
 
         protected function init()
         {
@@ -60,47 +61,31 @@ namespace {
                 ->exclude(['Lat' => null]);
         }
 
+        /**
+         * @param $request
+         * @return DBHTMLText
+         */
         public function rss($request)
         {
-            $matomoToken = '2e7b23946391c96a2d18f149578a5a2e';
-            $matomo = new MatomoTracker(17, 'https://piwik.casa-laguna.net');
-            $matomo->setTokenAuth($matomoToken);
-            $matomo->doTrackPageView('NZ LOI RSS Feed update');
             $data = $this->getDataItems($request);
-            $feed = new RSSFeed(
+            $feed = RSSFeed::create(
                 $data,
                 Director::absoluteBaseURL(),
                 'Locations of Interest',
                 null,
                 'getName',
-                'getDescription'
+                'getDescription',
+                $data->max('LastEdited')
             );
 
             return $feed->outputToBrowser();
         }
 
-        public function json($request)
-        {
-            if (Director::isLive()) {
-                $matomoToken = Environment::getEnv('MATOMOTOKEN');
-                $matomo = new MatomoTracker(16, 'https://piwik.casa-laguna.net');
-                $matomo->setTokenAuth($matomoToken);
-                $matomo->doTrackPageView('NZ LOI JSON Feed');
-            }
-
-            $this->Locations = Location::get();
-
-            $this->getResponse()->addHeader('Content-Type', 'application/json');
-
-            return $this->renderWith('Json');
-
-        }
-
         /**
          * @param $request
-         * @return \SilverStripe\ORM\DataList
+         * @return DataList
          */
-        protected function getDataItems($request): \SilverStripe\ORM\DataList
+        protected function getDataItems($request): DataList
         {
             $vars = $request->allParams();
             $filter = [];
