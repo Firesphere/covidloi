@@ -20,3 +20,13 @@ for (let i = 0; i < locations.length; i++) {
         marker.openPopup();
     }
 }
+
+const imgs = document.getElementsByClassName('leaflet-marker-icon');
+
+
+for (let j = 0; j < imgs.length; j++) {
+    let img = imgs[j];
+    let source = img.getAttribute('src').split('?');
+    img.src = source[0];
+
+}
