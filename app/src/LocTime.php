@@ -41,17 +41,15 @@ class LocTime extends DataObject
 
     public static function findOrCreate($data, $id)
     {
-        $time = explode('-', $data['Times']);
-        $locTime['Day'] = date('Y-m-d', strtotime($data['Day']));
-        $locTime['StartTime'] = date('H:i:s', strtotime($time[0]));
-        $locTime['EndTime'] = isset($time[1]) ? date('H:i:s', strtotime($time[1])) : null;
+        $locTime['Day'] = date('Y-m-d', strtotime($data['startDateTime']));
+        $locTime['StartTime'] = date('H:i:s', strtotime($data['startDateTime']));
+        $locTime['EndTime'] = isset($data['endDateTime']) ? date('H:i:s', strtotime($data['endDateTime'])) : null;
         $locTime['LocationID'] = $id;
 
         $find = LocTime::get()->filter($locTime);
 
         if (!$find->exists()) {
-            LocTime::create($locTime)->write();
-            return true;
+            return LocTime::create($locTime)->write();
         }
 
         return false;
@@ -87,7 +85,7 @@ class LocTime extends DataObject
 <b>What to do:</b><br />
 %s<br />
 <img src='%s' alt='Map for %s' />";
-        
+
         return
             sprintf(
                 $html,

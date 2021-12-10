@@ -28,8 +28,6 @@ namespace {
     class PageController extends ContentController
     {
 
-        protected $Locations;
-        protected $Pages;
         /**
          * An array of actions that can be accessed via a request. Each array element should be an action name, and the
          * permissions or conditions required to allow the user to access it.
@@ -46,20 +44,8 @@ namespace {
          * @var array
          */
         private static $allowed_actions = ['rss', 'search'];
-
-        protected function init()
-        {
-            parent::init();
-            Requirements::set_force_js_to_bottom(true);
-            Requirements::javascript('themes/simple/dist/main.js');
-            Requirements::css('themes/simple/dist/main.css');
-            RSSFeed::linkToFeed('/home/rss', 'NZ LOI RSS Feed');
-
-            $this->Pages = Page::get()->filter(['ShowInMenus' => true]);
-            $this->Locations = Location::get()
-                ->exclude(['Lat:GreaterThan' => 0])
-                ->exclude(['Lat' => null]);
-        }
+        protected $Locations;
+        protected $Pages;
 
         /**
          * @param $request
@@ -155,6 +141,20 @@ namespace {
             }
 
             return $this;
+        }
+
+        protected function init()
+        {
+            parent::init();
+            Requirements::set_force_js_to_bottom(true);
+            Requirements::javascript('themes/simple/dist/main.js');
+            Requirements::css('themes/simple/dist/main.css');
+            RSSFeed::linkToFeed('/home/rss', 'NZ LOI RSS Feed');
+
+            $this->Pages = Page::get()->filter(['ShowInMenus' => true]);
+            $this->Locations = Location::get()
+                ->exclude(['Lat:GreaterThan' => 0])
+                ->exclude(['Lat' => null]);
         }
 
     }

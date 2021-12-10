@@ -8,7 +8,7 @@ namespace {
  * Class \Page
  *
  */
-class Page extends SiteTree
+    class Page extends SiteTree
     {
         private static $db = [];
 

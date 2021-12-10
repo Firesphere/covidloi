@@ -2,6 +2,7 @@
 
 namespace Firesphere\Mini;
 
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBDatetime;
@@ -19,14 +20,7 @@ class Importer extends BuildTask
     ];
 
     /**
-     * @param \SilverStripe\Control\HTTPRequest $request
-     * @throws \PHPHtmlParser\Exceptions\ChildNotFoundException
-     * @throws \PHPHtmlParser\Exceptions\CircularException
-     * @throws \PHPHtmlParser\Exceptions\ContentLengthException
-     * @throws \PHPHtmlParser\Exceptions\LogicalException
-     * @throws \PHPHtmlParser\Exceptions\NotLoadedException
-     * @throws \PHPHtmlParser\Exceptions\StrictException
-     * @throws \SilverStripe\ORM\ValidationException
+     * @param HTTPRequest $request
      */
     public function run($request)
     {
@@ -38,84 +32,32 @@ class Importer extends BuildTask
             DB::query('TRUNCATE TABLE `Suburb`');
             DB::query('TRUNCATE TABLE `City`');
         }
-        $this->getMoHWebsite();
-
-        $this->getGithub();
+        $this->getAPI();
     }
 
-    /**
-     * @param $body
-     * @return \SilverStripe\ORM\FieldType\DBDate|DBDatetime
-     */
-    protected function getLastUpdated($body)
+    protected function getAPI()
     {
-        $mohUpdate = $body->find('p.georgia-italic')->text;
-        $mohUpdate = explode('updated:', $mohUpdate);
-        $mohUpdate = str_replace("&nbsp;", " ", $mohUpdate[1]);
-        $mohUpdate = explode(",", $mohUpdate);
-        $date = date('Y-m-d', strtotime($mohUpdate[1]));
-        $time = date('H:i:s', strtotime($mohUpdate[0]));
-        $time = DBDatetime::create()->setValue($date . ' ' . $time);
+        $data = file_get_contents('https://api.integration.covid19.health.nz/locations/v1/current-locations-of-interest');
+        $data = json_decode($data, true);
+        $lastUpdated = DBDatetime::now();
 
-        return $time;
-    }
+        foreach ($data['items'] as $item) {
 
-    /**
-     * @throws \PHPHtmlParser\Exceptions\ChildNotFoundException
-     * @throws \PHPHtmlParser\Exceptions\CircularException
-     * @throws \PHPHtmlParser\Exceptions\ContentLengthException
-     * @throws \PHPHtmlParser\Exceptions\LogicalException
-     * @throws \PHPHtmlParser\Exceptions\NotLoadedException
-     * @throws \PHPHtmlParser\Exceptions\StrictException
-     */
-    protected function getMoHWebsite()
-    {
-        $content = file_get_contents('https://www.health.govt.nz/our-work/diseases-and-conditions/covid-19-novel-coronavirus/covid-19-health-advice-public/contact-tracing-covid-19/covid-19-contact-tracing-locations-interest');
-        $dom = new \PHPHtmlParser\Dom();
-        $dom->loadStr($content);
-        $body = $dom->find('div.main-container.container');
-        $trs = $body->find('tr');
-        foreach ($trs as $tr) {
-            $tds = $tr->find('td');
-            $data = [];
-            $i = 0;
-            foreach ($tds as $td) {
-                $data[static::$map[$i]] = trim($td->innerText);
-                $i++;
-            }
-            if (count($data)) {
-                $data['Help'] = mb_convert_encoding($data['Help'], 'UTF-8');
-                $dt = explode(' ', $data['Added']);
-                $dt = date('Y-m-d ', strtotime($dt[0] . ' ' . $dt[1] . ' 2021')) .
-                    date('H:i:s', strtotime($dt[2] . $dt[3]));
-                $data['Added'] = $dt;
-                Location::findOrCreate($data);
-            }
-        }
-    }
+            $datatem = [
+                'Name'          => $item['eventName'],
+                'Address'       => $item['location']['address'],
+                'City'          => $item['location']['city'],
+                'Suburb'        => $item['location']['suburb'],
+                'Help'          => $item['publicAdvice'],
+                'Added'         => date('Y-m-d H:i:s', strtotime($item['publishedAt'])),
+                'Lat'           => $item['location']['latitude'],
+                'Lng'           => $item['location']['longitude'],
+                'LastUpdated'   => $item['updatedAt'] ?? $lastUpdated,
+                'startDateTime' => $item['startDateTime'],
+                'endDateTime'   => $item['endDateTime']
+            ];
 
-    protected function getGithub(): void
-    {
-        $json = file_get_contents('https://raw.githubusercontent.com/minhealthnz/nz-covid-data/main/locations-of-interest/august-2021/locations-of-interest.geojson');
-
-        $data = json_decode($json, 1);
-        $mohCodes = MoHCode::get()->column('Code');
-        foreach ($data['features'] as $location) {
-            if (!in_array($location['properties']['id'], $mohCodes)) {
-                $map = [
-                    'Name'    => $location['properties']['Event'],
-                    'Address' => $location['properties']['Location'],
-                    'Day'     => date('Y-m-d', strtotime(str_replace('/', '-', $location['properties']['Start']))),
-                    'Times'   => date('H:i:s',
-                            strtotime(str_replace('/', '-', $location['properties']['Start']))) . '-' .
-                        date('H:i:s', strtotime(str_replace('/', '-', $location['properties']['End']))),
-                    'Help'    => $location['properties']['Advice'],
-                    'Added'   => date('Y-m-d H:i:s')
-                ];
-                $mohCodes[] = $location['properties']['id'];
-                MoHCode::create(['Code' => $location['properties']['id']])->write();
-                Location::findOrCreateByLatLng($map);
-            }
+            Location::findOrCreate($datatem);
         }
     }
 }

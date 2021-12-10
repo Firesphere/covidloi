@@ -2,14 +2,16 @@
 
 namespace Firesphere\Mini;
 
+use PageController;
+
 /**
  * Class \Firesphere\Mini\RSSFeedPageController
  *
  * @property RSSFeedPage dataRecord
  * @method RSSFeedPage data()
- * @mixin RSSFeedPage
+ * @mixin RSSFeedPage dataRecord
  */
-class RSSFeedPageController extends \PageController
+class RSSFeedPageController extends PageController
 {
 
     public function index()

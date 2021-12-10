@@ -5,6 +5,7 @@ namespace Firesphere\Mini;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Environment;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\ValidationException;
 
 /**
  * Class \Firesphere\Mini\Suburb
@@ -40,61 +41,56 @@ class Suburb extends DataObject
         'getSpatial' => 'Spatial'
     ];
 
-    public function getSpatial()
-    {
-        if (!$this->Lat || !$this->Lng) {
-            $this->Lat = $this->Lng = 0;
-        }
-        return sprintf('%s,%s', $this->Lat, $this->Lng);
-    }
-
     /**
      * @param array $data
      * @param City $city
      * @return int|void
-     * @throws \SilverStripe\ORM\ValidationException
+     * @throws ValidationException
      */
     public static function findOrCreate($data, $city)
     {
-        foreach ($data as $value) {
-            foreach ($value['types'] as $type) {
-                if ($type === 'sublocality_level_1') {
-                    $suburb = $value['long_name'];
-                }
-                if ($type === 'postal_code') {
-                    $postal = $value['long_name'];
-                }
-            }
+        if (!$data['Suburb']) {
+            return 0;
         }
-        if (!isset($suburb) || is_array($suburb)) {
-            return;
-        }
-        if (!isset($postal) || is_array($postal)) {
-            return;
-        }
-
-        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s,New%%20Zealand&key=%s';
-
-        $result = file_get_contents(sprintf($url, Convert::raw2url(sprintf('%s,%s,%s', $suburb, $postal, $city->Name)),
-            Environment::getEnv('MAPSKEY')));
-
-        $result = json_decode($result);
-
+        $suburb = $data['Suburb'];
         $exist = Suburb::get()->filter(['Name' => $suburb])->first();
 
+        $write = false;
         if (!$exist) {
             $exist = Suburb::create();
             $exist->Name = $suburb;
             $exist->CityID = $city->ID;
+            $write = true;
+        }
+
+        if (!$exist->Lat) {
+            $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s,New%%20Zealand&key=%s';
+
+            $result = file_get_contents(sprintf($url, Convert::raw2url(sprintf('%s,%s', $suburb, $city->Name)),
+                Environment::getEnv('MAPSKEY')));
+
+            $result = json_decode($result);
             if (count($result->results)) {
                 $exist->Lat = $result->results[0]->geometry->location->lat;
                 $exist->Lng = $result->results[0]->geometry->location->lng;
+                $write = true;
             }
+        }
 
+        if ($write) {
             return $exist->write();
         }
 
         return $exist->ID;
 
+    }
+
+    public function getSpatial()
+    {
+        if (!$this->Lat || !$this->Lng) {
+            $this->Lat = $this->Lng = 0;
+        }
+
+        return sprintf('%s,%s', $this->Lat, $this->Lng);
     }
 }

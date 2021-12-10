@@ -9,6 +9,7 @@ use SilverStripe\Core\Environment;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\ORM\ValidationException;
 use SilverStripe\View\Parsers\URLSegmentFilter;
 use Wilr\GoogleSitemaps\Extensions\GoogleSitemapExtension;
 
@@ -80,12 +81,6 @@ class Location extends DataObject
         'Spatial'    => 'Spatial'
     ];
 
-    public function onBeforeWrite()
-    {
-        $this->getMapData();
-        parent::onBeforeWrite();
-    }
-
     public static function findOrCreate($data)
     {
         $data = self::formatNameAddr($data);
@@ -97,43 +92,53 @@ class Location extends DataObject
         ) {
             $filter = ['Name' => $data['Name']];
         }
-        $existing = Location::get()->filter($filter)->first();
+        $existing = self::get()->filter($filter)->first();
+        $write = false;
 
         if (!$existing) {
 
-            $existing = Location::create($data);
+            $existing = self::create($data);
 
             if (strpos($data['Name'], 'Bus') === false &&
                 strpos($data['Name'], 'Train') === false &&
                 strpos($data['Name'], 'Public Bus') === false &&
                 strpos($data['Name'], 'Flight') === false
             ) {
-                $result = self::getLatLng($data);
-
-                if (isset($result['results'][0])) {
-                    $city = City::findOrCreate($result['results'][0]['address_components']);
-                    $existing->Lat = $result['results'][0]['geometry']['location']['lat'];
-                    $existing->Lng = $result['results'][0]['geometry']['location']['lng'];
-                    $existing->CityID = $city[0];
-                    $existing->SuburbID = $city[1];
-                }
+                $city = City::findOrCreate($data);
+                $existing->CityID = $city[0];
+                $existing->SuburbID = $city[1];
             }
 
-            $existing->write();
+            $write = true;
+        }
+
+
+        if (!$existing->Lat) {
+            $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s,New%%20Zealand&key=%s';
+
+            $result = file_get_contents(sprintf($url, Convert::raw2url(sprintf('%s,%s', $data['Address'], $data['City'])),
+                Environment::getEnv('MAPSKEY')));
+
+            $result = json_decode($result);
+            if (count($result->results)) {
+                $existing->Lat = $result->results[0]->geometry->location->lat;
+                $existing->Lng = $result->results[0]->geometry->location->lng;
+                $write = true;
+            }
         }
 
         $id = $existing->ID;
-
+        if ($write) {
+            $id = $existing->write();
+        }
         $new = LocTime::findOrCreate($data, $id);
 
-        if ($new || !$existing->Help) {
+        if ($new || !$existing->LastUpdated) {
 
             $lastUpdate = $existing->Times()->sort('Day DESC, StartTime DESC')->first();
 
             $existing->LastUpdated = strtotime($lastUpdate->Day . ' ' . $lastUpdate->StartTime);
-            if (!$existing->Help) {
-                $existing->Help = $data['Help'];
-            }
+
             $existing->write();
         }
     }
@@ -160,59 +165,14 @@ class Location extends DataObject
         return $data;
     }
 
-    public static function findOrCreateByLatLng($data)
+    public function onBeforeWrite()
     {
-        $data = self::formatNameAddr($data);
-        $result = self::getLatLng($data);
-
-        if (isset($result['results'][0])) {
-            $data['Lat'] = $result['results'][0]['geometry']['location']['lat'];
-            $data['Lng'] = $result['results'][0]['geometry']['location']['lng'];
-            $existing = Location::get()
-                ->filter(['Lat' => trim($data['Lat']), 'Lng' => trim($data['Lng'])])
-                ->first();
-
-            if (!$existing) {
-                $city = City::findOrCreate($result['results'][0]['address_components']);
-                $existing = Location::create($data);
-                $existing->CityID = $city[0];
-                $existing->SuburbID = $city[1];
-                $existing->write();
-            }
-            $id = $existing->ID;
-
-            $new = LocTime::findOrCreate($data, $id);
-
-            if ($new || !$existing->Help) {
-                $lastUpdate = $existing->Times()->sort('Day DESC, StartTime DESC')->first();
-
-                $existing->LastUpdated = strtotime($lastUpdate->Day . ' ' . $lastUpdate->StartTime);
-                if (!$existing->Help) {
-                    $existing->Help = $data['Help'];
-                }
-                $existing->write();
-            }
-        }
+        $this->getMapData();
+        parent::onBeforeWrite();
     }
 
     /**
-     * @param array $existing
-     * @return mixed
-     */
-    protected static function getLatLng($existing)
-    {
-        $url = 'https://maps.googleapis.com/maps/api/geocode/json?';
-        $params = [
-            'address' => Convert::raw2url($existing['Address']),
-            'key'     => Environment::getEnv('MAPSKEY')
-        ];
-        $result = file_get_contents(sprintf('%s%s', $url, http_build_query($params)));
-
-        return json_decode($result, 1);
-    }
-
-    /**
-     * @throws \SilverStripe\ORM\ValidationException
+     * @throws ValidationException
      */
     public function getMapData(): void
     {
@@ -228,8 +188,9 @@ class Location extends DataObject
                 'markers' => sprintf('color:red|label:L|%s,%s', $this->Lat, $this->Lng),
                 'key'     => Environment::getEnv('MAPSKEY')
             ];
-            $fName = URLSegmentFilter::singleton()->filter($this->ID . '-' . $this->Name) . '.png';
-            $fContent = file_get_contents(sprintf('%s%s', $url, http_build_query($params)));
+            $fName = URLSegmentFilter::singleton()->filter(uniqid() . '-' . $this->Name) . '.png';
+            $link = sprintf('%s%s', $url, http_build_query($params));
+            $fContent = file_get_contents($link);
             $file->setFromString($fContent, $fName);
             $file->write();
             $file->publishSingle();
@@ -237,6 +198,12 @@ class Location extends DataObject
 
             $this->MapID = $file->ID;
         }
+    }
+
+    public function getRSSDescription()
+    {
+        return $this->getDescription() . sprintf("<br /><img src='%s' />", $this->Map()->getAbsoluteURL());
+
     }
 
     public function getDescription()
@@ -260,12 +227,6 @@ class Location extends DataObject
         return $return;
     }
 
-    public function getRSSDescription()
-    {
-        return $this->getDescription() . sprintf("<br /><img src='%s' />", $this->Map()->getAbsoluteURL());
-
-    }
-
     public function getSpatial()
     {
         if (!$this->Lat || !$this->Lng) {
@@ -282,14 +243,14 @@ class Location extends DataObject
         return DBDatetime::create()->setValue($this->Times()->Last()->Day . ' ' . $this->Times()->Last()->StartTime);
     }
 
-    public function Link()
-    {
-        return sprintf('/#%s', $this->ID);
-    }
-
     public function AbsoluteLink()
     {
         return Director::absoluteURL($this->Link());
+    }
+
+    public function Link()
+    {
+        return sprintf('/#%s', $this->ID);
     }
 
     public function getImagePreview()
@@ -298,5 +259,4 @@ class Location extends DataObject
             return $this->Map()->Fill(200, 100);
         }
     }
-
 }

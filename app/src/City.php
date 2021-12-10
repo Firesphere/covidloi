@@ -19,76 +19,68 @@ use SilverStripe\ORM\DataObject;
 class City extends DataObject
 {
 
-    private static $table_name = 'City';
-
-    private static $db = [
-        'Name' => 'Varchar(255)',
-        'Lat' => 'Varchar(15)',
-        'Lng' => 'Varchar(15)'
-    ];
-
-    private static $has_many = [
-        'Locations' => Location::class,
-        'Suburbs' => Suburb::class
-    ];
-
-    private static $casting = [
-        'Spatial' => 'Spatial',
-        'getSpatial' => 'Spatial'
-    ];
-
     protected static $map = [
         'AUK' => 'Auckland',
         'AKL' => 'Auckland',
         'WLG' => 'Wellington'
     ];
-
-    public function getSpatial()
-    {
-        if (!$this->Lat || !$this->Lng) {
-            $this->Lat = $this->Lng = 0;
-        }
-        return sprintf('%s,%s', $this->Lat, $this->Lng);
-    }
+    private static $table_name = 'City';
+    private static $db = [
+        'Name' => 'Varchar(255)',
+        'Lat'  => 'Varchar(15)',
+        'Lng'  => 'Varchar(15)'
+    ];
+    private static $has_many = [
+        'Locations' => Location::class,
+        'Suburbs'   => Suburb::class
+    ];
+    private static $casting = [
+        'Spatial'    => 'Spatial',
+        'getSpatial' => 'Spatial'
+    ];
 
     public static function findOrCreate($data)
     {
-        foreach ($data as $value) {
-            if ($value['types'][0] == 'administrative_area_level_1') {
-                $city = $value['long_name'];
-                break;
-            }
-        }
-        if (!isset($city) || is_array($city)) {
-            return;
-        }
-        if (array_key_exists(strtoupper($city), static::$map)) {
-            $city = static::$map[strtoupper($city)];
-        }
+        $city = $data['City'];
+        $exist = self::get()->filter(['Name' => $city])->first();
 
-        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s+New+Zealand&key=%s';
-
-        $result = file_get_contents(sprintf($url, Convert::raw2url($city),
-            Environment::getEnv('MAPSKEY')));
-
-        $result = json_decode($result);
-
-        /** @var City $exist */
-        $exist = City::get()->filter(['Name' => $city])->first();
-
+        $write = false;
         if (!$exist) {
-            $exist = City::create();
+            $exist = self::create();
             $exist->Name = $city;
+            $write = true;
+        }
+
+        if (!$exist->Lat) {
+            $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s+New+Zealand&key=%s';
+
+            $result = file_get_contents(sprintf($url, Convert::raw2url($city),
+                Environment::getEnv('MAPSKEY')));
+
+            $result = json_decode($result);
             if (count($result->results)) {
                 $exist->Lat = $result->results[0]->geometry->location->lat;
                 $exist->Lng = $result->results[0]->geometry->location->lng;
+                $write = true;
             }
+        }
+
+        if ($write) {
             $exist->write();
         }
 
         $subID = Suburb::findOrCreate($data, $exist);
 
         return [$exist->ID, $subID];
+    }
+
+    public function getSpatial()
+    {
+        if (!$this->Lat || !$this->Lng) {
+            $this->Lat = $this->Lng = 0;
+        }
+
+        return sprintf('%s,%s', $this->Lat, $this->Lng);
     }
 
 }
