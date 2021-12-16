@@ -20,11 +20,11 @@ namespace {
     use SilverStripe\View\Requirements;
 
     /**
- * Class \PageController
- *
- * @property Page dataRecord
- * @method Page data()
- */
+     * Class \PageController
+     *
+     * @property Page dataRecord
+     * @method Page data()
+     */
     class PageController extends ContentController
     {
 
@@ -85,8 +85,11 @@ namespace {
             }
 
             if (isset($gets['days'])) {
-                $sort = 'Location.Added DESC, Day DESC, StartTime DESC';
-                $filter['Location.Added:GreaterThan'] = date('Y-m-d 00:00:00', strtotime('-' . (int)$gets['days'] . ' days'));
+                if (!isset($filter['Location.City.Name'])) {
+                    $sort = 'Location.Added DESC, Day DESC, StartTime DESC';
+                }
+                $filter['Location.Added:GreaterThan'] = date('Y-m-d 00:00:00',
+                    strtotime('-' . (int)$gets['days'] . ' days'));
             }
 
             $list = $list->filter($filter)
