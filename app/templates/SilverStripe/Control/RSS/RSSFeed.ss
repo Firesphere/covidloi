@@ -5,7 +5,6 @@
 		<link>$Link</link>
 		<atom:link href="$Link" rel="self" type="application/rss+xml" />
 		<description>$Description.XML</description>
-
 		<% loop $Entries %>
 		<item>
 			<title>$Title.XML</title>
@@ -15,7 +14,8 @@
 			<% else %><pubDate>$Created.Rfc822</pubDate><% end_if %>
             <lastBuildDate>$LastUpdated.Rfc822</lastBuildDate>
 			<% if $Author %><dc:creator>$Author.XML</dc:creator><% end_if %>
-			<guid>$AbsoluteLink</guid>
+			<guid isPermaLink="true">$AbsoluteLink</guid>
+			<category>$Location.City.Name</category>
 		</item>
 		<% end_loop %>
 	</channel>
