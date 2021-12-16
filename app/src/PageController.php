@@ -76,7 +76,7 @@ namespace {
             $vars = $request->allParams();
             $gets = $request->getVars();
             $filter = [];
-            $sort = 'Added DESC, Day DESC, StartTime DESC';
+            $sort = 'Location.Added DESC, Day DESC, StartTime DESC';
             $list = LocTime::get();
             if ($vars['ID'] == 'location') {
                 $filter['Location.City.Name'] = ucfirst($vars['OtherID']);
@@ -85,7 +85,7 @@ namespace {
             }
 
             if (isset($gets['days'])) {
-                $filter['Added:GreaterThan'] = date('Y-m-d 00:00:00', strtotime('-' . (int)$gets['days']));
+                $filter['Location.Added:GreaterThan'] = date('Y-m-d 00:00:00', strtotime('-' . (int)$gets['days'] . ' days'));
             }
 
             $list = $list->filter($filter)
