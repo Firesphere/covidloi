@@ -946,24 +946,24 @@
         },
         {
             "name": "fgrosse/phpasn1",
-            "version": "v2.3.1",
+            "version": "v2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fgrosse/PHPASN1.git",
-                "reference": "6edcecb4df8b6881e79080d5e363dc8b90d4558c"
+                "reference": "eef488991d53e58e60c9554b09b1201ca5ba9296"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fgrosse/PHPASN1/zipball/6edcecb4df8b6881e79080d5e363dc8b90d4558c",
-                "reference": "6edcecb4df8b6881e79080d5e363dc8b90d4558c",
+                "url": "https://api.github.com/repos/fgrosse/PHPASN1/zipball/eef488991d53e58e60c9554b09b1201ca5ba9296",
+                "reference": "eef488991d53e58e60c9554b09b1201ca5ba9296",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0.0"
+                "php": "~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0"
             },
             "require-dev": {
                 "php-coveralls/php-coveralls": "~2.0",
-                "phpunit/phpunit": "^6.3 | ^7.0"
+                "phpunit/phpunit": "^6.3 || ^7.0 || ^8.0"
             },
             "suggest": {
                 "ext-bcmath": "BCmath is the fallback extension for big integer calculations",
@@ -1013,7 +1013,7 @@
                 "x509",
                 "x690"
             ],
-            "time": "2021-12-09T20:59:31+00:00"
+            "time": "2021-12-11T12:41:06+00:00"
         },
         {
             "name": "firesphere/solr-search",
@@ -3057,16 +3057,16 @@
         },
         {
             "name": "phptek/sentry",
-            "version": "4.0.6",
+            "version": "4.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phptek/silverstripe-sentry.git",
-                "reference": "1699415017a72fe9156a59fa42523d2d9398fee7"
+                "reference": "9c4f8e1c80232f0e574cfa118f55bb7bfa72ce4b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phptek/silverstripe-sentry/zipball/1699415017a72fe9156a59fa42523d2d9398fee7",
-                "reference": "1699415017a72fe9156a59fa42523d2d9398fee7",
+                "url": "https://api.github.com/repos/phptek/silverstripe-sentry/zipball/9c4f8e1c80232f0e574cfa118f55bb7bfa72ce4b",
+                "reference": "9c4f8e1c80232f0e574cfa118f55bb7bfa72ce4b",
                 "shasum": ""
             },
             "require": {
@@ -3111,7 +3111,7 @@
                 "sentry",
                 "silverstripe"
             ],
-            "time": "2021-11-08T00:02:29+00:00"
+            "time": "2021-12-14T19:38:33+00:00"
         },
         {
             "name": "psr/cache",

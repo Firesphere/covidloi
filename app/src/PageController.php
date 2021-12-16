@@ -68,24 +68,31 @@ namespace {
         }
 
         /**
-         * @param $request
+         * @param \SilverStripe\Control\HTTPRequest $request
          * @return DataList
          */
         protected function getDataItems($request): DataList
         {
             $vars = $request->allParams();
+            $gets = $request->getVars();
             $filter = [];
             $sort = 'Added DESC, Day DESC, StartTime DESC';
             $list = LocTime::get();
             if ($vars['ID'] == 'location') {
-                $filter['Location.City.Name'] = ucfirst($request->param('OtherID'));
+                $filter['Location.City.Name'] = ucfirst($vars['OtherID']);
             } else {
                 $list = $list->innerJoin('Location', 'Location.ID = LocTime.LocationID');
-                $sort = 'Added DESC, Day DESC, StartTime DESC';
             }
 
-            return $list->filter($filter)
+            $list = $list->filter($filter)
                 ->sort($sort);
+
+            if (isset($gets['limit'])) {
+                $limit = (int)$gets['limit'];
+                $list = $list->limit($limit);
+            }
+
+            return $list;
         }
 
         public function SearchForm()

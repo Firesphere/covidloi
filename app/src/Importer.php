@@ -10,6 +10,8 @@ use SilverStripe\ORM\FieldType\DBDatetime;
 class Importer extends BuildTask
 {
 
+    protected static $MoHCodes = [];
+
     protected static $map = [
         'Name',
         'Address',
@@ -32,6 +34,8 @@ class Importer extends BuildTask
             DB::query('TRUNCATE TABLE `Suburb`');
             DB::query('TRUNCATE TABLE `City`');
         }
+
+        static::$MoHCodes = MoHCode::get()->column('Code');
         $this->getAPI();
     }
 
@@ -42,22 +46,26 @@ class Importer extends BuildTask
         $lastUpdated = DBDatetime::now();
 
         foreach ($data['items'] as $item) {
+            if (!in_array($item['eventId'], static::$MoHCodes)) {
+                $mohCode = MoHCode::create(['Code' => $item['eventId']])->write();
+                $datatem = [
+                    'MoHCodeID'     => $mohCode,
+                    'Name'          => $item['eventName'],
+                    'Address'       => $item['location']['address'],
+                    'City'          => $item['location']['city'],
+                    'Suburb'        => $item['location']['suburb'],
+                    'Help'          => $item['publicAdvice'],
+                    'Added'         => date('Y-m-d H:i:s', strtotime($item['publishedAt'])),
+                    'Lat'           => $item['location']['latitude'],
+                    'Lng'           => $item['location']['longitude'],
+                    'LastUpdated'   => $item['updatedAt'] ?? $lastUpdated,
+                    'Type'          => $item['exposureType'],
+                    'startDateTime' => $item['startDateTime'],
+                    'endDateTime'   => $item['endDateTime']
+                ];
 
-            $datatem = [
-                'Name'          => $item['eventName'],
-                'Address'       => $item['location']['address'],
-                'City'          => $item['location']['city'],
-                'Suburb'        => $item['location']['suburb'],
-                'Help'          => $item['publicAdvice'],
-                'Added'         => date('Y-m-d H:i:s', strtotime($item['publishedAt'])),
-                'Lat'           => $item['location']['latitude'],
-                'Lng'           => $item['location']['longitude'],
-                'LastUpdated'   => $item['updatedAt'] ?? $lastUpdated,
-                'startDateTime' => $item['startDateTime'],
-                'endDateTime'   => $item['endDateTime']
-            ];
-
-            Location::findOrCreate($datatem);
+                Location::findOrCreate($datatem);
+            }
         }
     }
 }

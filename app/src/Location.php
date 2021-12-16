@@ -23,12 +23,15 @@ use Wilr\GoogleSitemaps\Extensions\GoogleSitemapExtension;
  * @property string $Lat
  * @property string $Lng
  * @property string $LastUpdated
+ * @property string $Type
  * @property int $CityID
  * @property int $SuburbID
  * @property int $MapID
+ * @property int $MoHCodeID
  * @method City City()
  * @method Suburb Suburb()
  * @method Image Map()
+ * @method MoHCode MoHCode()
  * @method DataList|LocTime[] Times()
  * @mixin GoogleSitemapExtension
  */
@@ -44,13 +47,15 @@ class Location extends DataObject
         'Added'       => 'Datetime',
         'Lat'         => 'Varchar(50)',
         'Lng'         => 'Varchar(50)',
-        'LastUpdated' => 'Datetime'
+        'LastUpdated' => 'Datetime',
+        'Type'        => 'Varchar(255)'
     ];
 
     private static $has_one = [
         'City'   => City::class,
         'Suburb' => Suburb::class,
         'Map'    => Image::class,
+        'MoHCode' => MoHCode::class
     ];
 
     private static $has_many = [
@@ -116,7 +121,8 @@ class Location extends DataObject
         if (!$existing->Lat) {
             $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s,New%%20Zealand&key=%s';
 
-            $result = file_get_contents(sprintf($url, Convert::raw2url(sprintf('%s,%s', $data['Address'], $data['City'])),
+            $result = file_get_contents(sprintf($url,
+                Convert::raw2url(sprintf('%s,%s', $data['Address'], $data['City'])),
                 Environment::getEnv('MAPSKEY')));
 
             $result = json_decode($result);
@@ -125,6 +131,16 @@ class Location extends DataObject
                 $existing->Lng = $result->results[0]->geometry->location->lng;
                 $write = true;
             }
+        }
+
+        if (!$existing->MoHCodeID) {
+            $existing->MoHCodeID = $data['MoHCodeID'];
+            $write = true;
+        }
+
+        if (!$existing->Type) {
+            $existing->Type = $data['Type'];
+            $write = true;
         }
 
         $id = $existing->ID;
