@@ -84,6 +84,10 @@ namespace {
                 $list = $list->innerJoin('Location', 'Location.ID = LocTime.LocationID');
             }
 
+            if (isset($gets['days'])) {
+                $filter['Added:GreaterThan'] = date('Y-m-d 00:00:00', strtotime('-' . (int)$gets['days']));
+            }
+
             $list = $list->filter($filter)
                 ->sort($sort);
 
