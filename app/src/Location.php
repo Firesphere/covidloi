@@ -23,7 +23,7 @@ use Wilr\GoogleSitemaps\Extensions\GoogleSitemapExtension;
  * @property string $Lat
  * @property string $Lng
  * @property string $LastUpdated
- * @property string $Type
+ * @property string $ExposureType
  * @property int $CityID
  * @property int $SuburbID
  * @property int $MapID
@@ -41,14 +41,14 @@ class Location extends DataObject
     private static $table_name = 'Location';
 
     private static $db = [
-        'Name'        => 'Varchar(255)',
-        'Address'     => 'Text',
-        'Help'        => 'Text',
-        'Added'       => 'Datetime',
-        'Lat'         => 'Varchar(50)',
-        'Lng'         => 'Varchar(50)',
-        'LastUpdated' => 'Datetime',
-        'Type'        => 'Varchar(255)'
+        'Name'         => 'Varchar(255)',
+        'Address'      => 'Text',
+        'Help'         => 'Text',
+        'Added'        => 'Datetime',
+        'Lat'          => 'Varchar(50)',
+        'Lng'          => 'Varchar(50)',
+        'LastUpdated'  => 'Datetime',
+        'ExposureType' => 'Varchar(255)'
     ];
 
     private static $has_one = [
@@ -138,8 +138,8 @@ class Location extends DataObject
             $write = true;
         }
 
-        if (!$existing->Type) {
-            $existing->Type = $data['Type'];
+        if (!$existing->ExposureType) {
+            $existing->ExposureType = $data['ExposureType'];
             $write = true;
         }
 

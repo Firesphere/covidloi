@@ -21,11 +21,11 @@ namespace {
     use SilverStripe\View\Requirements;
 
     /**
-     * Class \PageController
-     *
-     * @property Page dataRecord
-     * @method Page data()
-     */
+ * Class \PageController
+ *
+ * @property Page dataRecord
+ * @method Page data()
+ */
     class PageController extends ContentController
     {
 

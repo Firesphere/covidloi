@@ -59,7 +59,7 @@ class Importer extends BuildTask
                     'Lat'           => $item['location']['latitude'],
                     'Lng'           => $item['location']['longitude'],
                     'LastUpdated'   => $item['updatedAt'] ?? $lastUpdated,
-                    'Type'          => $item['exposureType'],
+                    'ExposureType'  => $item['exposureType'],
                     'startDateTime' => $item['startDateTime'],
                     'endDateTime'   => $item['endDateTime']
                 ];

@@ -12,10 +12,10 @@
         <% cached 'RSSFeed', $lastModified %>
 		<% loop $Entries %>
 		<item>
-			<title><% if $Location.Type == 'Close' %>🔴 <% end_if %><% if $Title %>$Title.XML<% else %>$Location.Address.XML<% end_if %></title>
+			<title><% if $Location.ExposureType == 'Close' %>🔴 <% end_if %><% if $Title %>$Title.XML<% else %>$Location.Address.XML<% end_if %></title>
 			<link>$AbsoluteLink.XML</link>
 			<description><![CDATA[<h3>$Location.Address</h3>
-			<% if $Location.Type == 'Close' %><h4>🔴 Close contact location</h4><% end_if %>
+			<% if $Location.ExposureType == 'Close' %><h4>🔴 Close contact location</h4><% end_if %>
                 <b>Date:</b> $Day.Nice<br />
                 <b>Time:</b> $StartTime.Nice - $EndTime.Nice<br />
                 <% if $Location.Type %><b>Exposure type:</b> $Location.Type<% end_if %>
