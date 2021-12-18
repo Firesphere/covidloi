@@ -16,6 +16,7 @@ namespace {
     use SilverStripe\Forms\FormAction;
     use SilverStripe\Forms\TextField;
     use SilverStripe\ORM\DataList;
+    use SilverStripe\ORM\FieldType\DBDatetime;
     use SilverStripe\ORM\FieldType\DBHTMLText;
     use SilverStripe\View\Requirements;
 
@@ -54,14 +55,15 @@ namespace {
         public function rss($request)
         {
             $data = $this->getDataItems($request);
-            $feed = RSSFeed::create(
+            $feed = new RSSFeed(
                 $data,
                 Director::absoluteBaseURL(),
                 'Locations of Interest',
-                null,
+                'Locations of Interest regarding the COVID-19 spread in New Zealand.',
                 'getName',
                 'getDescription',
-                $data->max('LastEdited')
+                null,
+                DBDatetime::create()->setValue($data->max('LastEdited'))->Rfc822()
             );
 
             return $feed->outputToBrowser();

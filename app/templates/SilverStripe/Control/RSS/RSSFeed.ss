@@ -1,10 +1,14 @@
 <?xml version="1.0"?>
-<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:atom="http://www.w3.org/2005/Atom"
+     xmlns:georss="http://www.georss.org/georss">
 	<channel>
 		<title>$Title</title>
 		<link>$Link</link>
-		<atom:link href="$Link" rel="self" type="application/rss+xml" />
+		<atom:link href="$Link('home/rss')" rel="self" type="application/rss+xml" />
 		<description>$Description.XML</description>
+        <lastBuildDate>$lastModified</lastBuildDate>
 		<% loop $Entries %>
 		<item>
 			<title>$Title.XML</title>
@@ -12,10 +16,10 @@
 			<% if $Description %><description>$Description.CDATA</description><% end_if %>
 			<% if $Date %><pubDate>$Date.Rfc822</pubDate>
 			<% else %><pubDate>$Created.Rfc822</pubDate><% end_if %>
-            <lastBuildDate>$LastUpdated.Rfc822</lastBuildDate>
 			<% if $Author %><dc:creator>$Author.XML</dc:creator><% end_if %>
 			<guid isPermaLink="true">$AbsoluteLink</guid>
 			<category>$Location.City.Name</category>
+			<georss:point>$Location.Lat $Location.Lng</georss:point>
 		</item>
 		<% end_loop %>
 	</channel>
