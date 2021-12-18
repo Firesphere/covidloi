@@ -40,7 +40,14 @@ class LocTime extends DataObject
         'LastUpdated' => 'Datetime',
     ];
 
-    protected static $html = "<h3>%s</h3><b>Date:</b> %s<br /><b>Time:</b> %s-%s<br /><b>What to do:</b><br />%s<br /><img src='%s' alt='Map for %s' />";
+    protected static $html = "<h3>%s</h3>
+<b>Date:</b> %s<br />
+<b>Time:</b> %s-%s<br />
+<b>What to do:</b><br />%s<br />
+<figure id='map-%s'>
+<img src='%s' alt='Map for %s' title='Map for %s' />
+<figcaption>%s</figcaption>
+</figure>";
 
     public static function findOrCreate($data, $id)
     {
@@ -82,17 +89,27 @@ class LocTime extends DataObject
 
     public function getDescription()
     {
-
+        $location = $this->Location();
 
         $content = sprintf(
             static::$html,
-            $this->Location()->Address,
+            $location->Address,
             $this->dbObject('Day')->Nice(),
             $this->dbObject('StartTime')->Nice(),
             $this->dbObject('EndTime')->Nice(),
-            trim($this->Location()->Help),
-            $this->Location()->Map()->AbsoluteLink(),
-            $this->Location()->Name);
+            trim($location->Help),
+            $this->ID,
+            $location->Map()->AbsoluteLink(),
+            $location->Name,
+            $location->Name,
+            sprintf(
+                '%s, %s %s',
+                $location->Name,
+                $location->Lat,
+                $location->Lng
+            )
+        );
+
         return
             DBHTMLText::create()->setValue($content);
     }
