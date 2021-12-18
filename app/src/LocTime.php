@@ -100,8 +100,8 @@ class LocTime extends DataObject
             $this->dbObject('EndTime')->Nice(),
             trim($location->Help)
         );
-        
-        if ($location->Map()->exists()) {
+
+        if ($location->MapID) {
             $content .= sprintf(
                 static::$html_image,
                 $this->ID,
