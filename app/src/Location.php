@@ -52,9 +52,9 @@ class Location extends DataObject
     ];
 
     private static $has_one = [
-        'City'   => City::class,
-        'Suburb' => Suburb::class,
-        'Map'    => Image::class,
+        'City'    => City::class,
+        'Suburb'  => Suburb::class,
+        'Map'     => Image::class,
         'MoHCode' => MoHCode::class
     ];
 
