@@ -9,7 +9,7 @@
 		<atom:link href="$Link('home/rss')" rel="self" type="application/rss+xml" />
 		<description>$Description.XML</description>
         <lastBuildDate>$lastModified</lastBuildDate>
-        <% cached $lastModified %>
+        <% cached 'RSSFeed', $lastModified %>
 		<% loop $Entries %>
 		<item>
 			<title><% if $Title %>$Title.XML<% else %>$Location.Address.XML<% end_if %></title>
@@ -37,7 +37,7 @@
                 <% if $City.Name %><category>$City.Name</category><% end_if %>
                 <% if $Lat %><georss:point>$Lat $Lng</georss:point><% end_if %>
             <% end_with %>
-            <guid>$ID</guid>
+            <guid>$Link</guid>
         </item>
 		<% end_loop %>
         <% end_cached %>
