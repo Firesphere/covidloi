@@ -97,12 +97,12 @@ namespace {
             $list = $list->filter($filter)
                 ->sort($sort);
 
+            $limit = 100;
             if (isset($gets['limit'])) {
                 $limit = (int)$gets['limit'];
-                $list = $list->limit($limit);
             }
 
-            return $list;
+            return $list->limit($limit);
         }
 
         public function SearchForm()
