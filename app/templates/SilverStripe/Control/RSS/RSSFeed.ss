@@ -17,9 +17,10 @@
 			<% if $Date %><pubDate>$Date.Rfc822</pubDate>
 			<% else %><pubDate>$Created.Rfc822</pubDate><% end_if %>
 			<% if $Author %><dc:creator>$Author.XML</dc:creator><% end_if %>
-			<guid isPermaLink="true">$AbsoluteLink</guid>
-			<category>$Location.City.Name</category>
-			<georss:point>$Location.Lat $Location.Lng</georss:point>
+			<% with $Location %>
+                <% if $City.Name %><category>$City.Name</category><% end_if %>
+                <% if $Lat %><georss:point>$Lat $Lng</georss:point><% end_if %>
+            <% end_with %>
 		</item>
 		<% end_loop %>
 	</channel>

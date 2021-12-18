@@ -2,6 +2,7 @@
 
 namespace Firesphere\Mini;
 
+use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBHTMLText;
@@ -43,8 +44,8 @@ class LocTime extends DataObject
     protected static $html = "<h3>%s</h3>
 <b>Date:</b> %s<br />
 <b>Time:</b> %s-%s<br />
-<b>What to do:</b><br />%s<br />
-<figure id='map-%s'>
+<b>What to do:</b><br />%s";
+    protected static $html_image = "<br /><figure id='map-%s'>
 <img src='%s' alt='Map for %s' title='Map for %s' />
 <figcaption>%s</figcaption>
 </figure>";
@@ -93,24 +94,29 @@ class LocTime extends DataObject
 
         $content = sprintf(
             static::$html,
-            $location->Address,
+            Convert::raw2att($location->Address),
             $this->dbObject('Day')->Nice(),
             $this->dbObject('StartTime')->Nice(),
             $this->dbObject('EndTime')->Nice(),
-            trim($location->Help),
-            $this->ID,
-            $location->Map()->AbsoluteLink(),
-            $location->Name,
-            $location->Name,
-            sprintf(
-                '%s, %s %s',
-                $location->Name,
-                $location->Lat,
-                $location->Lng
-            )
+            trim($location->Help)
         );
+        
+        if ($location->Map()->exists()) {
+            $content .= sprintf(
+                static::$html_image,
+                $this->ID,
+                $location->Map()->AbsoluteLink(),
+                Convert::raw2att($location->Name),
+                Convert::raw2att($location->Name),
+                sprintf(
+                    '%s, %s %s',
+                    Convert::raw2att($location->Name),
+                    $location->Lat,
+                    $location->Lng
+                )
+            );
+        }
 
-        return
-            DBHTMLText::create()->setValue($content);
+        return DBHTMLText::create()->setValue($content);
     }
 }
