@@ -55,7 +55,7 @@ namespace {
         public function rss($request)
         {
             $data = $this->getDataItems($request);
-            $feed = new RSSFeed(
+            $feed = RSSFeed::create(
                 $data,
                 Director::absoluteBaseURL(),
                 'Locations of Interest',

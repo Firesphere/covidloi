@@ -4,6 +4,7 @@ namespace Firesphere\Mini;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\ORM\FieldType\DBHTMLText;
 
 /**
  * Class \Firesphere\Mini\LocTime
@@ -38,6 +39,8 @@ class LocTime extends DataObject
     private static $casting = [
         'LastUpdated' => 'Datetime',
     ];
+
+    protected static $html = "<h3>%s</h3><b>Date:</b> %s<br /><b>Time:</b> %s-%s<br /><b>What to do:</b><br />%s<br /><img src='%s' alt='Map for %s' />";
 
     public static function findOrCreate($data, $id)
     {
@@ -79,23 +82,18 @@ class LocTime extends DataObject
 
     public function getDescription()
     {
-        $html = "<h3>%s</h3>
-<b>Date:</b> %s<br />
-<b>Time:</b> %s-%s<br />
-<b>What to do:</b><br />
-%s<br />
-<img src='%s' alt='Map for %s' />";
 
+
+        $content = sprintf(
+            static::$html,
+            $this->Location()->Address,
+            $this->dbObject('Day')->Nice(),
+            $this->dbObject('StartTime')->Nice(),
+            $this->dbObject('EndTime')->Nice(),
+            trim($this->Location()->Help),
+            $this->Location()->Map()->AbsoluteLink(),
+            $this->Location()->Name);
         return
-            sprintf(
-                $html,
-                htmlspecialchars_decode($this->Location()->Address),
-                $this->dbObject('Day')->Nice(),
-                $this->dbObject('StartTime')->Nice(),
-                $this->dbObject('EndTime')->Nice(),
-                htmlspecialchars_decode(trim($this->Location()->Help)),
-                $this->Location()->Map()->AbsoluteLink(),
-                htmlspecialchars_decode($this->Location()->Name)
-            );
+            DBHTMLText::create()->setValue($content);
     }
 }
