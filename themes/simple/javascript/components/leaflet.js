@@ -16,7 +16,9 @@ for (let i = 0; i < locations.length; i++) {
     let marker = new L.marker([locations[i][1], locations[i][2]])
         .bindPopup(locations[i][0])
         .addTo(mymap);
-    if (window.location.hash === '#' + locations[i][3]) {
+    let hash = window.location.hash;
+    hash = hash.split('-')
+    if (hash[0] === '#' + locations[i][3]) {
         marker.openPopup();
     }
 }

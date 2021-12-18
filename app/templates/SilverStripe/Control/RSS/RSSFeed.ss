@@ -37,7 +37,7 @@
                 <% if $City.Name %><category>$City.Name</category><% end_if %>
                 <% if $Lat %><georss:point>$Lat $Lng</georss:point><% end_if %>
             <% end_with %>
-            <guid>$AbsoluteLink</guid>
+            <guid>$AbsoluteLink-$ID</guid>
         </item>
 		<% end_loop %>
         <% end_cached %>
