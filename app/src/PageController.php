@@ -11,6 +11,7 @@ namespace {
     use SilverStripe\CMS\Controllers\ContentController;
     use SilverStripe\Control\Director;
     use SilverStripe\Control\RSS\RSSFeed;
+    use SilverStripe\Core\Environment;
     use SilverStripe\Forms\DropdownField;
     use SilverStripe\Forms\FieldList;
     use SilverStripe\Forms\FormAction;
@@ -77,11 +78,17 @@ namespace {
         {
             $vars = $request->allParams();
             $gets = $request->getVars();
+            $matomo = new MatomoTracker(16, 'https://piwik.casa-laguna.net');
+            $matomo->setTokenAuth(Environment::getEnv('MATOMOTOKEN'));
+            $matomo->disableSendImageResponse();
+            $matomo->doTrackPageView('RSS Feed');
             $filter = [];
             $sort = 'Added DESC, Day DESC, StartTime DESC';
             $list = LocTime::get();
             if ($vars['ID'] == 'location') {
                 $filter['Location.City.Name'] = ucfirst($vars['OtherID']);
+                $matomo->doTrackEvent('RSS', 'location', $vars['OtherID'] ?? 'none');
+
             } else {
                 $list = $list->innerJoin('Location', 'Location.ID = LocTime.LocationID');
             }
@@ -92,14 +99,17 @@ namespace {
                 }
                 $filter['Location.Added:GreaterThan'] = date('Y-m-d 00:00:00',
                     strtotime('-' . (int)$gets['days'] . ' days'));
+                $matomo->doTrackEvent('RSS', 'range', 'days', (int)$gets['days']);
+
             }
 
             $list = $list->filter($filter)
                 ->sort($sort);
 
-            $limit = 100;
+            $limit = 250;
             if (isset($gets['limit'])) {
                 $limit = (int)$gets['limit'];
+                $matomo->doTrackEvent('RSS', 'range', 'limit', (int)$gets['limit']);
             }
 
             return $list->limit($limit);
