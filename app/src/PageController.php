@@ -81,6 +81,9 @@ namespace {
             $matomo = new MatomoTracker(16, 'https://piwik.casa-laguna.net');
             $matomo->setTokenAuth(Environment::getEnv('MATOMOTOKEN'));
             $matomo->disableSendImageResponse();
+            $matomo->setUserAgent($request->getHeader('user-agent'));
+            $matomo->setIp($request->getIP());
+            $matomo->setBrowserLanguage($request->getHeader('accept-language'));
             $matomo->doTrackPageView('RSS Feed');
             $filter = [];
             $sort = 'Added DESC, Day DESC, StartTime DESC';
