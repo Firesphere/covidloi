@@ -10,6 +10,7 @@ namespace {
     use Firesphere\SolrSearch\Queries\BaseQuery;
     use SilverStripe\CMS\Controllers\ContentController;
     use SilverStripe\Control\Director;
+    use SilverStripe\Control\HTTPRequest;
     use SilverStripe\Control\RSS\RSSFeed;
     use SilverStripe\Core\Environment;
     use SilverStripe\Forms\DropdownField;
@@ -71,27 +72,20 @@ namespace {
         }
 
         /**
-         * @param \SilverStripe\Control\HTTPRequest $request
+         * @param HTTPRequest $request
          * @return DataList
          */
         protected function getDataItems($request): DataList
         {
             $vars = $request->allParams();
             $gets = $request->getVars();
-            $matomo = new MatomoTracker(16, 'https://piwik.casa-laguna.net');
-            $matomo->setTokenAuth(Environment::getEnv('MATOMOTOKEN'));
-            $matomo->disableSendImageResponse();
-            $matomo->setUserAgent($request->getHeader('user-agent'));
-            $matomo->setIp($request->getIP());
-            $matomo->setBrowserLanguage($request->getHeader('accept-language'));
-            $matomo->doTrackPageView('RSS Feed');
+            $matomo = $this->getMatomo($request);
             $filter = [];
             $sort = 'Added DESC, Day DESC, StartTime DESC';
             $list = LocTime::get();
             if ($vars['ID'] == 'location') {
                 $filter['Location.City.Name'] = ucfirst($vars['OtherID']);
                 $matomo->doTrackEvent('RSS', 'location', $vars['OtherID'] ?? 'none');
-
             } else {
                 $list = $list->innerJoin('Location', 'Location.ID = LocTime.LocationID');
             }
@@ -103,7 +97,11 @@ namespace {
                 $filter['Location.Added:GreaterThan'] = date('Y-m-d 00:00:00',
                     strtotime('-' . (int)$gets['days'] . ' days'));
                 $matomo->doTrackEvent('RSS', 'range', 'days', (int)$gets['days']);
+            }
 
+            if (isset($gets['sort']) && $gets['sort'] == 'days') {
+                $sort = 'Day DESC, StartTime DESC';
+                $matomo->doTrackEvent('RSS', 'sort', 'days');
             }
 
             $list = $list->filter($filter)
@@ -185,6 +183,23 @@ namespace {
             $this->Locations = Location::get()
                 ->exclude(['Lat:GreaterThan' => 0])
                 ->exclude(['Lat' => null]);
+        }
+
+        /**
+         * @param HTTPRequest $request
+         * @return MatomoTracker
+         */
+        protected function getMatomo(HTTPRequest $request): MatomoTracker
+        {
+            $matomo = new MatomoTracker(16, 'https://piwik.casa-laguna.net');
+            $matomo->setTokenAuth(Environment::getEnv('MATOMOTOKEN'));
+            $matomo->disableSendImageResponse();
+            $matomo->setUserAgent($request->getHeader('user-agent'));
+            $matomo->setIp($request->getIP());
+            $matomo->setBrowserLanguage($request->getHeader('accept-language'));
+            $matomo->doTrackPageView('RSS Feed');
+
+            return $matomo;
         }
 
     }
