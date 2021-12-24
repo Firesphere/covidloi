@@ -12,7 +12,6 @@ Firesphere\SolrSearch\Services\SolrCoreService:
 Firesphere\SolrSearch\Indexes\BaseIndex:
   LOIIndex:
     Classes:
-      - Page
       - Firesphere\Mini\Location
     FulltextFields:
       - Name
@@ -20,14 +19,13 @@ Firesphere\SolrSearch\Indexes\BaseIndex:
       - Help
       - Lat
       - Lng
+      - LastUpdated
       - City.Name
       - City.Spatial
       - Suburb.Name
       - Suburb.Spatial
-      - Times.LastUpdated
       - Spatial
-    FilterFields:
-      - OwnerID
+    FilterFields: []
     FacetFields:
       Firesphere\Mini\City:
         BaseClass: Firesphere\Mini\Location
