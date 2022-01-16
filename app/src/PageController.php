@@ -58,6 +58,7 @@ namespace {
         public function rss($request)
         {
             $matomo = $this->getMatomo($request);
+            $matomo->doTrackPageView('RSS Feed');
             $data = $this->getDataItems($request, $matomo);
             $feed = RSSFeed::create(
                 $data,
@@ -70,7 +71,6 @@ namespace {
                 DBDatetime::create()->setValue($data->max('LastEdited'))->Rfc822()
             );
 
-            $matomo->doTrackPageView('RSS Feed');
             $matomo->doBulkTrack();
 
             return $feed->outputToBrowser();
