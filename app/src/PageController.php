@@ -49,6 +49,7 @@ namespace {
         private static $allowed_actions = ['rss', 'search'];
         protected $Locations;
         protected $Pages;
+        protected $matomo;
 
         /**
          * @param $request
@@ -57,9 +58,8 @@ namespace {
          */
         public function rss($request)
         {
-            $matomo = $this->getMatomo($request);
-            $matomo->doTrackPageView('RSS Feed');
-            $data = $this->getDataItems($request, $matomo);
+            $this->matomo->doTrackPageView('RSS Feed');
+            $data = $this->getDataItems($request);
             $feed = RSSFeed::create(
                 $data,
                 Director::absoluteBaseURL(),
@@ -71,17 +71,16 @@ namespace {
                 DBDatetime::create()->setValue($data->max('LastEdited'))->Rfc822()
             );
 
-            $matomo->doBulkTrack();
+            $this->matomo->doBulkTrack();
 
             return $feed->outputToBrowser();
         }
 
         /**
          * @param HTTPRequest $request
-         * @param MatomoTracker $matomo
          * @return DataList
          */
-        protected function getDataItems($request, $matomo): DataList
+        protected function getDataItems($request): DataList
         {
             $vars = $request->allParams();
             $gets = $request->getVars();
@@ -90,7 +89,7 @@ namespace {
             $list = LocTime::get();
             if ($vars['ID'] == 'location') {
                 $filter['Location.City.Name'] = ucfirst($vars['OtherID']);
-                $matomo->doTrackEvent('RSS', 'location', $vars['OtherID'] ?? 'none');
+                $this->matomo->doTrackEvent('RSS', 'location', $vars['OtherID'] ?? 'none');
             } else {
                 $list = $list->innerJoin('Location', 'Location.ID = LocTime.LocationID');
             }
@@ -101,12 +100,12 @@ namespace {
                 }
                 $filter['Location.Added:GreaterThan'] = date('Y-m-d 00:00:00',
                     strtotime('-' . (int)$gets['days'] . ' days'));
-                $matomo->doTrackEvent('RSS', 'range', 'days', (int)$gets['days']);
+                $this->matomo->doTrackEvent('RSS', 'range', 'days', (int)$gets['days']);
             }
 
             if (isset($gets['sort']) && $gets['sort'] == 'days') {
                 $sort = 'Day DESC, StartTime DESC';
-                $matomo->doTrackEvent('RSS', 'sort', 'days');
+                $this->matomo->doTrackEvent('RSS', 'sort', 'days');
             }
 
             $list = $list->filter($filter)
@@ -115,7 +114,7 @@ namespace {
             $limit = 250;
             if (isset($gets['limit'])) {
                 $limit = (int)$gets['limit'];
-                $matomo->doTrackEvent('RSS', 'range', 'limit', (int)$gets['limit']);
+                $this->matomo->doTrackEvent('RSS', 'range', 'limit', (int)$gets['limit']);
             }
 
             return $list->limit($limit);
@@ -179,32 +178,33 @@ namespace {
         protected function init()
         {
             parent::init();
-            Requirements::set_force_js_to_bottom(true);
-            Requirements::javascript('themes/simple/dist/main.js');
-            Requirements::css('themes/simple/dist/main.css');
-            RSSFeed::linkToFeed('/home/rss', 'NZ LOI RSS Feed');
+            if ($this->getURLParams()['Action'] !== 'rss') {
+                Requirements::set_force_js_to_bottom(true);
+                Requirements::javascript('themes/simple/dist/main.js');
+                Requirements::css('themes/simple/dist/main.css');
+                RSSFeed::linkToFeed('/home/rss', 'NZ LOI RSS Feed');
 
-            $this->Pages = Page::get()->filter(['ShowInMenus' => true]);
-            $this->Locations = Location::get()
-                ->exclude(['Lat:GreaterThan' => 0])
-                ->exclude(['Lat' => null]);
+                $this->Pages = Page::get()->filter(['ShowInMenus' => true]);
+                $this->Locations = Location::get()
+                    ->exclude(['Lat:GreaterThan' => 0])
+                    ->exclude(['Lat' => null]);
+            } else {
+                $this->getMatomo($this->getRequest());
+            }
         }
 
         /**
          * @param HTTPRequest $request
-         * @return MatomoTracker
          */
-        protected function getMatomo(HTTPRequest $request): MatomoTracker
+        protected function getMatomo(HTTPRequest $request)
         {
-            $matomo = new MatomoTracker(16, 'https://piwik.casa-laguna.net');
-            $matomo->doBulkRequests = true;
-            $matomo->setTokenAuth(Environment::getEnv('MATOMOTOKEN'));
-            $matomo->disableSendImageResponse();
-            $matomo->setUserAgent($request->getHeader('user-agent'));
-            $matomo->setIp($request->getIP());
-            $matomo->setBrowserLanguage($request->getHeader('accept-language'));
-
-            return $matomo;
+            $this->matomo = new MatomoTracker(16, 'https://piwik.casa-laguna.net');
+            $this->matomo->doBulkRequests = true;
+            $this->matomo->setTokenAuth(Environment::getEnv('MATOMOTOKEN'));
+            $this->matomo->disableSendImageResponse();
+            $this->matomo->setUserAgent($request->getHeader('user-agent'));
+            $this->matomo->setIp($request->getIP());
+            $this->matomo->setBrowserLanguage($request->getHeader('accept-language'));
         }
 
     }
