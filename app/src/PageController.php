@@ -203,7 +203,7 @@ namespace {
             $this->matomo->setTokenAuth(Environment::getEnv('MATOMOTOKEN'));
             $this->matomo->disableSendImageResponse();
             $this->matomo->setUserAgent($request->getHeader('user-agent'));
-            $this->matomo->setIp($request->getIP());
+            $this->matomo->setIp($request->getVar('X-Forwarded-For') ?? $request->getIP());
             $this->matomo->setBrowserLanguage($request->getHeader('accept-language'));
         }
 
