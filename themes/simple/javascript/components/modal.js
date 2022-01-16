@@ -1,3 +1,4 @@
+window._paq = window._paq || [];
 document.addEventListener('click', function (e) {
     let target = e.target;
 
@@ -8,6 +9,8 @@ document.addEventListener('click', function (e) {
             document.getElementById('modal-title').innerHTML = content.Title;
             document.getElementById('modal-content').innerHTML = content.Content;
             document.getElementById('modal-item').classList.add('open');
+            window._paq.push(['trackPageView', content.Title]);
+            window._paq.push(['trackEvent', 'Modal', 'Open', content.Title]);
             // document.getElementById()
             e.preventDefault();
         }
@@ -17,6 +20,7 @@ document.addEventListener('click', function (e) {
     if ((target.hasAttribute('data-dismiss') && target.getAttribute('data-dismiss') === 'modal') || target.classList.contains('modal')) {
         let modal = document.querySelector('[class="modal open"]');
         modal.classList.remove('open');
+        window._paq.push(['trackEvent', 'Modal', 'Close']);
         e.preventDefault();
     }
 }, false);
