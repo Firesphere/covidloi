@@ -10,7 +10,9 @@
 		<description>$Description.XML</description>
         <lastBuildDate>$lastModified</lastBuildDate>
 		<% loop $Entries %>
-            <% include Item %>
+        <% cached 'RSSEntry', $ID, $LastEdited %>
+        <% include Item %>
+        <% end_cached %>
 		<% end_loop %>
 	</channel>
 </rss>
