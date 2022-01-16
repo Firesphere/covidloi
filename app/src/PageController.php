@@ -23,11 +23,11 @@ namespace {
     use SilverStripe\View\Requirements;
 
     /**
- * Class \PageController
- *
- * @property Page dataRecord
- * @method Page data()
- */
+     * Class \PageController
+     *
+     * @property Page dataRecord
+     * @method Page data()
+     */
     class PageController extends ContentController
     {
 
@@ -53,10 +53,12 @@ namespace {
         /**
          * @param $request
          * @return DBHTMLText
+         * @throws Exception
          */
         public function rss($request)
         {
-            $data = $this->getDataItems($request);
+            $matomo = $this->getMatomo($request);
+            $data = $this->getDataItems($request, $matomo);
             $feed = RSSFeed::create(
                 $data,
                 Director::absoluteBaseURL(),
@@ -68,18 +70,21 @@ namespace {
                 DBDatetime::create()->setValue($data->max('LastEdited'))->Rfc822()
             );
 
+            $matomo->doTrackPageView('RSS Feed');
+            $matomo->doBulkTrack();
+
             return $feed->outputToBrowser();
         }
 
         /**
          * @param HTTPRequest $request
+         * @param MatomoTracker $matomo
          * @return DataList
          */
-        protected function getDataItems($request): DataList
+        protected function getDataItems($request, $matomo): DataList
         {
             $vars = $request->allParams();
             $gets = $request->getVars();
-            $matomo = $this->getMatomo($request);
             $filter = [];
             $sort = 'Added DESC, Day DESC, StartTime DESC';
             $list = LocTime::get();
@@ -192,12 +197,12 @@ namespace {
         protected function getMatomo(HTTPRequest $request): MatomoTracker
         {
             $matomo = new MatomoTracker(16, 'https://piwik.casa-laguna.net');
+            $matomo->doBulkRequests = true;
             $matomo->setTokenAuth(Environment::getEnv('MATOMOTOKEN'));
             $matomo->disableSendImageResponse();
             $matomo->setUserAgent($request->getHeader('user-agent'));
             $matomo->setIp($request->getIP());
             $matomo->setBrowserLanguage($request->getHeader('accept-language'));
-            $matomo->doTrackPageView('RSS Feed');
 
             return $matomo;
         }
