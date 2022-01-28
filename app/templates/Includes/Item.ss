@@ -22,7 +22,15 @@
     </description>
     <% if $City.Name %><category>$City.Name</category><% end_if %>
     <% if $Lat %><georss:point>$Lat $Lng</georss:point><% end_if %>
+    <pubDate>
+        <% if $LastUpdated %>
+            $LastUpdated.Rfc822
+        <% else_if $Date %>
+            $Date.Rfc822
+        <% else %>
+            $Created.Rfc822
+        <% end_if %>
+    </pubDate>
     <% end_with %>
-    <% if $Date %><pubDate>$Date.Rfc822</pubDate><% else %><pubDate>$Created.Rfc822</pubDate><% end_if %>
     <guid>$AbsoluteLink-$ID</guid>
 </item>

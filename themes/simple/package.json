@@ -7,6 +7,7 @@
   "dependencies": {
     "@sentry/browser": "^5.28.0",
     "@sentry/tracing": "^5.28.0",
+    "add-event-to-calendar": "^1.0.7",
     "leaflet": "^1.7.1"
   },
   "devDependencies": {
