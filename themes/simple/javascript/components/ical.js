@@ -35,10 +35,10 @@ Date.prototype.addMonths = function (value) {
 };
 
 Date.prototype.updateWeekend = function () {
-    let value = this.getDay()
-    this.setDate(1);
-    if (value === 0) {
-        value = value + 1;
+    let days = this.getDay();
+    let value = 0;
+    if (days === 0) {
+        value = 1;
     }
     if (value === 6) {
         value = 2;
@@ -58,9 +58,7 @@ const getCalendarEvent = TCalendarEvent => ({
 
 const updateDate = () => {
     let value = inputdate.value;
-    calcdate = new Date(value);
-    calcdate.addMonths(4).updateWeekend();
-    return calcdate
+    return new Date(value).addMonths(4).updateWeekend();
 }
 
 button.addEventListener('click', () => {
