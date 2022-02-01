@@ -3,18 +3,16 @@ import makeUrl, { TCalendarEvent } from 'add-event-to-calendar';
 const inputdate = document.getElementById('booster-date');
 const inputlocation = document.getElementById('booster-location');
 const button = document.getElementById('get-links');
-const googlelink = document.getElementById('google-link');
-const outlooklink = document.getElementById('outlook-link');
-const yahoolink = document.getElementById('yahoo-link');
-const icslink = document.getElementById('ics-link');
+const calLinks = Array.from(document.getElementsByClassName('calendar-link'));
 const calendarlinks = document.getElementById('booster-links');
-let calcdate;
+const boosterdate = document.getElementById('booster-plan');
+let value = new Date();
 
-Date.isLeapYear = function (year) {
+Date.isLeapYear = (year) => {
     return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0));
 };
 
-Date.getDaysInMonth = function (year, month) {
+Date.getDaysInMonth = (year, month) => {
     return [31, (Date.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
 };
 
@@ -36,14 +34,14 @@ Date.prototype.addMonths = function (value) {
 
 Date.prototype.updateWeekend = function () {
     let days = this.getDay();
-    let value = 0;
+    let dayvalue = 0;
     if (days === 0) {
-        value = 1;
+        dayvalue = 1;
     }
-    if (value === 6) {
-        value = 2;
+    if (days === 6) {
+        dayvalue = 2;
     }
-    this.setDate(this.getDate() + value);
+    this.setDate(this.getDate() + dayvalue);
     return this;
 
 }
@@ -52,20 +50,17 @@ const getCalendarEvent = TCalendarEvent => ({
     name: `Booster shot`,
     location: inputlocation.value,
     details: `Booster shot for Covid-19`,
-    startsAt: updateDate(),
-    endsAt: updateDate()
+    startsAt: value,
+    endsAt: value
 });
 
-const updateDate = () => {
-    let value = inputdate.value;
-    return new Date(value).addMonths(4).updateWeekend();
-}
-
 button.addEventListener('click', () => {
+    value = new Date(inputdate.value).addMonths(4).updateWeekend();
     let links = makeUrl(getCalendarEvent());
-    googlelink.setAttribute('href', links.google);
-    yahoolink.setAttribute('href', links.yahoo);
-    outlooklink.setAttribute('href', links.outlook);
-    icslink.setAttribute('href', links.ics);
+    calLinks.forEach((item) => {
+        let type = item.getAttribute('data-type');
+        item.setAttribute('href', links[type]);
+    });
+    boosterdate.innerText = value.toDateString();
     calendarlinks.classList.remove('hidden');
 });
