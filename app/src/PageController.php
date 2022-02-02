@@ -60,6 +60,7 @@ namespace {
         {
             $this->matomo->doTrackPageView('RSS Feed');
             $data = $this->getDataItems($request);
+            $lastModified = LocTime::get()->last();
             $feed = RSSFeed::create(
                 $data,
                 Director::absoluteBaseURL(),
@@ -68,7 +69,7 @@ namespace {
                 'getName',
                 'getDescription',
                 null,
-                DBDatetime::create()->setValue($data->max('LastEdited'))->Rfc822()
+                DBDatetime::create()->setValue($lastModified->LastEdited)->Rfc822()
             );
 
             $this->matomo->doBulkTrack();
