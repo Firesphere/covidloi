@@ -9,6 +9,7 @@ const calendarlinks = document.getElementById('booster-links');
 const boosterdate = document.getElementById('booster-plan');
 let value = new Date();
 let months = 3;
+
 Date.isLeapYear = (year) => {
     return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0));
 };
@@ -56,7 +57,7 @@ const getCalendarEvent = TCalendarEvent => ({
 });
 
 button.addEventListener('click', () => {
-    months = inputmonths.value;
+    months = parseInt(inputmonths.value);
     value = new Date(inputdate.value).addMonths(months).updateWeekend();
     let links = makeUrl(getCalendarEvent());
     calLinks.forEach((item) => {
