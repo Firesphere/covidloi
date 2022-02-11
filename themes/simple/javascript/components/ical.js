@@ -1,13 +1,14 @@
 import makeUrl, { TCalendarEvent } from 'add-event-to-calendar';
 
 const inputdate = document.getElementById('booster-date');
+const inputmonths = document.getElementById('booster-months');
 const inputlocation = document.getElementById('booster-location');
 const button = document.getElementById('get-links');
 const calLinks = Array.from(document.getElementsByClassName('calendar-link'));
 const calendarlinks = document.getElementById('booster-links');
 const boosterdate = document.getElementById('booster-plan');
 let value = new Date();
-
+let months = 3;
 Date.isLeapYear = (year) => {
     return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0));
 };
@@ -55,7 +56,8 @@ const getCalendarEvent = TCalendarEvent => ({
 });
 
 button.addEventListener('click', () => {
-    value = new Date(inputdate.value).addMonths(4).updateWeekend();
+    months = inputmonths.value;
+    value = new Date(inputdate.value).addMonths(months).updateWeekend();
     let links = makeUrl(getCalendarEvent());
     calLinks.forEach((item) => {
         let type = item.getAttribute('data-type');

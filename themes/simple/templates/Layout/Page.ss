@@ -6,28 +6,39 @@
         <div id="modal-content">$Content</div>
         <% if $ClassName == 'Page' %>
             <h3>Get a calendar reminder for your booster shot</h3>
-        <table>
-            <tr><td>
-                <label for="booster-date">When did you have your last shot?</label><br />
-</td><td>            <input type="date" id="booster-date" /><br />
-</td></tr>
-            <tr><td>
-                <label for="booster-location">Location (optional)</label><br />
-</td><td>            <input type="text" id="booster-location" /><br />
-</td></tr>
-        </table>
+            <table>
+                <tr>
+                    <td><label for="booster-date">When did you have your last shot?</label></td>
+                    <td><input type="date" id="booster-date" /></td>
+                </tr>
+                <tr>
+                    <td><label for="booster-months">How many months do you want to wait?</label></td>
+                    <td>
+                        <select id="booster-months">
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="booster-location">Location (optional)</label></td>
+                    <td><input type="text" id="booster-location" /></td>
+                </tr>
+            </table>
             <input type="button" value="Get calendar links" id="get-links" />
-        <div id="booster-links" class="hidden">
-            <br />
-            <h4>The earliest you can get your booster is: <span id="booster-plan"></span></h4>
-            <p>Click the links to import a reminder in to your calendar.</p>
-            <p>
-            <a href="#" target="_blank" class="calendar-link" data-type="google">Google Calendar</a> |
-            <a href="#" target="_blank" class="calendar-link" data-type="outlook">Outlook Calendar</a> |
-            <a href="#" target="_blank" class="calendar-link" data-type="yahoo">Yahoo Calendar</a> |
-            <a href="#" target="_blank" class="calendar-link" data-type="ics">ICS Calendar file</a>
-            </p>
-        </div>
+            <div id="booster-links" class="hidden">
+                <br />
+                <h4>The earliest you can get your booster is: <span id="booster-plan"></span></h4>
+                <p>Click the links to import a reminder in to your preferred calendar.</p>
+                <p>
+                    <a href="#" target="_blank" class="calendar-link" data-type="google">Google Calendar</a> |
+                    <a href="#" target="_blank" class="calendar-link" data-type="outlook">Outlook Calendar</a> |
+                    <a href="#" target="_blank" class="calendar-link" data-type="yahoo">Yahoo Calendar</a> |
+                    <a href="#" target="_blank" class="calendar-link" data-type="ics">ICS Calendar file</a>
+                </p>
+            </div>
         <% end_if %>
     </div>
 </div>
